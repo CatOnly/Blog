@@ -104,7 +104,7 @@
 查看当前目录下文件（不包括隐藏文件）：`ls`
 查看当前目录下所有文件（包括隐藏文件）：`ls -la`
 
-- 其中 `-l` 代表控制输出格式，表示输出详情
+- 其中 `-l` 代表控制输出格式，表示输出详情，**可用于查看软链接的链接地址**
 - `-la` 表示输出所有文件
 - `-lA` 表示输出除了当前文件夹  `.` 和父级文件夹 `..` 以外的其他文件
 
@@ -146,7 +146,7 @@
 1. `rmdir ./file_path  `或 `mkdir file_path`，在当前目录下删除 file_path 文件夹，如果文件夹 file_path 不为空，无法删除
 2. `rm -R ./file_path` ，在当前目录下删除 file_path 文件夹，及其内部所有内容
 
-创建文件软连接（快捷方式）：`ln -s 原始目录 软连接目录`
+**创建文件软连接（快捷方式）**：`ln -s 原始目录 软连接目录`
 
 复制
 
@@ -199,3 +199,14 @@ drwxr-xr-x@              23    sun  staff      736  3 26 10:46  book
   文件所属组 权限为 r-x，n = 4 + 0 + 1 = 5
   其他用户 权限为 -w-，n = 0 + 2 + 0 = 2
   最终为` chmod 752 文件或目录路径`
+
+
+
+## 6. alias 简化命令
+
+alias 可以为命令设置别称
+
+- 格式：alias 别称=命令
+- 输入 `alias` 可以查看使用 alias 设置的所有别称
+- 例：把 vscode 作为系统内置的命令，可以将以下 shell 代码放到 `~/.bash_profile` 文件中
+   `alias vscode='/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code'`
