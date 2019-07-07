@@ -65,6 +65,19 @@
 
 
 
+## 4. 常用文本编辑快捷键
+
+- Ctrl + a：跳到命令行首
+  Ctrl + e：跳到命令行尾
+- Ctrl + u：删除光标至命令行首的内容
+  Ctrl + k：删除光标至命令行尾的内容
+- Ctrl + $ \leftarrow$  跳到前一个单词首部
+  Ctrl + $ \rightarrow$  跳到后一个单词尾部
+- Ctrl +l 清屏（shell）
+
+
+
+
 # 二、路径和文件
 
 
