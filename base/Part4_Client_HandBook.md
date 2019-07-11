@@ -51,10 +51,12 @@
 
 
 
-## 七、测试
+## 七、调试
 
 1. [logcat 抓取 app 日志](https://blog.csdn.net/tscying/article/details/79317537)
 2. [adb logcat 的妙用（输出 log 到指定文件中）](https://blog.csdn.net/qq_34801506/article/details/81014994)
+3. `adb push path_compute path_mobile`：从电脑上传送文件到手机
+   `adb pull path_mobile path_compute`：从手机传送文件到电脑上
 
 
 
