@@ -1,14 +1,19 @@
 [TOC]
 
-# Android
 
-## 一、Android Studio 使用
+<p><h1><center>平台常用知识体系梳理</center></h1></p>
+> 宗旨，不要浪费时间在已有的工具/文章上，复用别人的工具/文章，让自己更专注于自己的领域
+
+## 一、Android 平台
+
+### 1. Android Studio 使用
 
 1. [全局搜索](https://jingyan.baidu.com/article/ca2d939d7943e3eb6c31cebc.html)
 
 
 
-## 二、Android 项目工程文件
+
+###2. Android 项目工程文件
 
 1. [Android 程序入口以及项目文件夹的含义](https://www.cnblogs.com/mingjiatang/p/5978538.html)
 2. [gradle 配置](https://www.cnblogs.com/wxishang1991/p/5457878.html)
@@ -17,13 +22,16 @@
 
 
 
-## 三、四大组件
+
+### 3. 相机
 
 1. [Android四大组件：这是一份全面 & 详细的Activity学习指南](https://blog.csdn.net/carson_ho/article/details/82848840)
+2. [Camera2 简介](https://www.jianshu.com/p/23e8789fbc10)
 
 
 
-## 四、存储
+
+### 4. 存储
 
 1. [Android 文件外/内部存储的获取各种存储目录路径](https://www.jianshu.com/p/2de0113b3164)
    [Android中读取assets目录下的文件详细介绍](https://blog.csdn.net/greathfs/article/details/52123984)
@@ -31,7 +39,8 @@
 
 
 
-## 五、JNI
+
+### 5. 编译 JNI
 
 1. [如何将Android studio 的项目变成Lib工程，供项目使用](https://blog.csdn.net/qq_33373648/article/details/75671402)
 2. [Android 调用so库全过程](https://blog.csdn.net/liujian8654562/article/details/78717149)
@@ -46,13 +55,13 @@
 
 
 
-## 六、语法
+### 6. 语法
 
 1. [android 不建议使用枚举类](https://www.cnblogs.com/zgz345/p/5871351.html)
 
 
 
-## 七、调试
+### 7. 调试
 
 1. [logcat 抓取 app 日志](https://blog.csdn.net/tscying/article/details/79317537)
 2. [adb logcat 的妙用（输出 log 到指定文件中）](https://blog.csdn.net/qq_34801506/article/details/81014994)
@@ -60,29 +69,62 @@
    `adb pull path_mobile path_compute`：从手机传送文件到电脑上
 4. [系统自带的 GPU 呈现分析](https://www.cnblogs.com/ldq2016/p/6667381.html)
 5. [高通骁龙 Adreno GPU Profiler 调试工具（建议在 windows 下使用，mac 下测试无用）](https://gameinstitute.qq.com/community/detail/123051)
+6. [GAPID 调试 Android 应用，需要 Android stuido 停用 adb 的使用](http://www.geeks3d.com/20171214/google-gapid-capture-vulkan-and-opengl-es-calls-on-android-windows-macos-and-linux/)
 
 
 
-# iOS
+## 二、iOS 平台
 
-## 一、编译配置
+### 1. Xcode 使用
+
+
+
+
+### 2. Xcode 项目工程文件
 
 1. [Xcode添加头文件路径和链接库文件](https://blog.csdn.net/tintinr/article/details/50936313)
 2. [Xcode中的环境变量](https://www.jianshu.com/p/74b2a1a46179)
 
 
 
-## 二、基础数据
-
-1. [NSString / NSData / char* 类型之间的转换](https://www.cnblogs.com/pengyingh/articles/2341880.html)
+### 3. 相机
 
 
 
-## 三、存储路径
+
+### 4. 存储
 
 1. [iOS 目录结构](https://my.oschina.net/liuchuanfeng/blog/388338)
 
 
 
-# QT
+### 5. 编译
 
+
+
+### 6. 语法
+
+1. [NSString / NSData / char* 类型之间的转换](https://www.cnblogs.com/pengyingh/articles/2341880.html)
+
+
+
+### 7. 调试
+
+
+
+
+## 三、QT 平台
+
+### 1. QCreator 使用
+
+### 2. QCreator 项目工程文件
+
+### 3. 相机
+
+### 4. 存储
+
+### 5. 编译
+
+### 6. 语法
+
+### 7. 调试
