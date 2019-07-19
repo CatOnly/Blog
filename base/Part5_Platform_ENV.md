@@ -1,15 +1,17 @@
 [TOC]
 
-# 环境配置问题总结
+<p><h1> <center>问题总结 - 常见平台环境配置问题</center> </h1></p>
 
-## 一、Android 的通用 BUG
+## 一、Android 平台问题
 
 ### 1. Android Studio IDE 的问题
-1. Android Studio
-2. 有时候 Run 产生的异常信息要比 Build 要清晰
+1. Android Studio 有时候 Run 产生的异常信息要比 Build 要清晰
 3. 确定 Android Studio 的 build Varians 是否正确，在不同 build Varians 来回切换可以解决一些莫名其妙的问题
 4. 确定 local.properties 中的 NDK 和 SDK 路径是否正确（为了维持项目的整体稳定，做到最小修改，有些 module 在 gradle 配置里会定义自己使用的 NDK 和 SDK 路径）
    `.mk` 和 cmake 文件里也会重新配置新的 NDK 路径，也需要核实一遍
+5. 在编写 JNI 代码时，如果有多个 JNI 文件要使用 Android Studio 会报一些
+   jni.h 找不到，C++ 文件找不到等 IDE 代码拼写检查错误，在这种情况下，JNI 部分没有代码提醒，**即使编译运行都没有问题**，Studio 还是会报错
+   建议找个文本编辑器编写，忽略 Studio 的拼写检查
 
 
 
@@ -65,3 +67,7 @@
 ### 5. Java 层问题
 1.  Java 代码的混淆
 这时要将三方库集成到该项目，需要在名称类似 proguard.pro 的文件里添加三方库的 java 包名，便于 java 代码混淆后的链接
+
+
+
+## 二、iOS 平台问题

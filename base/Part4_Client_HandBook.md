@@ -42,6 +42,7 @@
 5. [string 、 char* 和 jstring 的互相转换](https://blog.csdn.net/xlxxcc/article/details/51106721)
    [jni 获取对象 string 类型属性](https://blog.csdn.net/xiuye2015/article/details/90111908)
 6. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
+7. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
 
 
 
@@ -57,6 +58,8 @@
 2. [adb logcat 的妙用（输出 log 到指定文件中）](https://blog.csdn.net/qq_34801506/article/details/81014994)
 3. `adb push path_compute path_mobile`：从电脑上传送文件到手机
    `adb pull path_mobile path_compute`：从手机传送文件到电脑上
+4. [系统自带的 GPU 呈现分析](https://www.cnblogs.com/ldq2016/p/6667381.html)
+5. [高通骁龙 Adreno GPU Profiler 调试工具（建议在 windows 下使用，mac 下测试无用）](https://gameinstitute.qq.com/community/detail/123051)
 
 
 
