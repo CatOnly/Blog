@@ -48,10 +48,12 @@
    [JNI API 介绍](https://blog.csdn.net/yuzhou_zang/article/details/78410632)
 4. [aar 介绍](https://blog.csdn.net/xiexiangyu92/article/details/75200091)
    [aar = jar + so 介绍](https://blog.csdn.net/mq2856992713/article/details/77619299)
-5. [string 、 char* 和 jstring 的互相转换](https://blog.csdn.net/xlxxcc/article/details/51106721)
+5. [JNI 数据类型转换和 JNIEnv 的介绍、操作 jobject，以及 jstring 的介绍](https://blog.csdn.net/u010947098/article/details/71079380)
+6. [string 、 char* 和 jstring 的互相转换](https://blog.csdn.net/xlxxcc/article/details/51106721)
    [jni 获取对象 string 类型属性](https://blog.csdn.net/xiuye2015/article/details/90111908)
-6. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
-7. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
+7. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
+8. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
+9. [三方库管理存储工具 Maven](https://www.cnblogs.com/zachary7/p/7975632.html)
 
 
 

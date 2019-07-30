@@ -76,7 +76,7 @@ int main()
 
 ```shell
 $gcc hello.c	# GCC 编译器经过预处理，编译，汇编，链接，得到文件 a.out
-$./a.out 		# 运行 a.out 文件
+$./a.out 		  # 运行 a.out 文件
 Hello World		# 得到 a.out 文件的运行结果
 ```
 
@@ -85,7 +85,7 @@ Hello World		# 得到 a.out 文件的运行结果
 ## 1. 预处理（Prepressing）
 
 ```shell
-$cpp hello.c > hello.i		# CPP 预编译器 把 hello.c 文件生成 .i 文件
+$cpp hello.c > hello.i		  # CPP 预编译器 把 hello.c 文件生成 .i 文件
 $gcc -E hello.c -o hello.i	# GCC 编译器通过 -E 进行预编译，由 .c 文件生成 .i 文件
 ```
 
@@ -136,7 +136,7 @@ gcc 会根据不同类型的源文件调用相应的编译程序进行 词法分
 ## 3. 汇编（Assembly）
 
 ```shell
-$as hello.s -o hello.o		#  as 汇编器将 .s 文件汇编为 .o 二进制文件
+$as hello.s -o hello.o		  #  as 汇编器将 .s 文件汇编为 .o 二进制文件
 $gcc -c hello.s -o hello.o	# GCC 编译器将 .s 文件汇编为 .o 二进制文件
 $gcc -c hello.c -o hello.o	# GCC 编译器将 .c 文件编译为 .o 二进制文件
 ```
@@ -181,6 +181,8 @@ $ld -static crtl.o crti.o crtbeginT.o hello.o -start-group -lgcc -lgcc_eh -lc -e
 
 
 # 三、编译后数据的存储
+
+## 内存布局
 
 
 
