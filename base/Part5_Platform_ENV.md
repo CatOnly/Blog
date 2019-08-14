@@ -3,7 +3,7 @@
 <p><h1> <center>问题总结 - 常见平台环境配置问题</center> </h1></p>
 ## 一、Android 平台问题
 
-### 1. Android Studio IDE 的问题
+### 1. Android Studio 的问题
 1. Android Studio 有时候 Run 产生的异常信息要比 Build 要清晰
 2. 确定 Android Studio 的 build Varians 是否正确，在不同 build Varians 来回切换可以解决一些莫名其妙的问题
 3. 确定 local.properties 中的 NDK 和 SDK 路径是否正确（为了维持项目的整体稳定，做到最小修改，有些 module 在 gradle 配置里会定义自己使用的 NDK 和 SDK 路径）
@@ -14,7 +14,7 @@
 
 
 
-### 2. Android Studio IDE 缓存更新不及时问题
+### 2. Android Studio 缓存更新不及时问题
 **Android Studio 编译操作介绍**
 
 - Make Project
@@ -70,4 +70,28 @@
 
 
 
+### 6. 包管理问题
+
+1. Java 语言的项目一般采用 maven 进行包的存储和管理，[关于 maven 的介绍看这里](https://www.cnblogs.com/zachary7/p/7975632.html)
+
+
+
+
+
 ## 二、iOS 平台问题
+
+### 1. Xcode 的问题
+
+1. 证书问题
+   证书运行发现过期或者没有时（本来是有的），需要先 build 下在运行，可消除错误
+2. 代码错误提示一直存在
+   Xcode 卡顿了，需要等一段时间错误会自动消失
+
+
+
+### 2. Xcode 缓存更新不及时问题
+
+
+
+### 3. clang 编译、连接问题
+

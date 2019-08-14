@@ -49,11 +49,12 @@
 4. [aar 介绍](https://blog.csdn.net/xiexiangyu92/article/details/75200091)
    [aar = jar + so 介绍](https://blog.csdn.net/mq2856992713/article/details/77619299)
 5. [JNI 数据类型转换和 JNIEnv 的介绍、操作 jobject，以及 jstring 的介绍](https://blog.csdn.net/u010947098/article/details/71079380)
-6. [string 、 char* 和 jstring 的互相转换](https://blog.csdn.net/xlxxcc/article/details/51106721)
+6. [GetObjectClass、FindClass和GetMethodID](https://www.jianshu.com/p/dddb0ccd476a)
+7. [string 、 char* 和 jstring 的互相转换](https://blog.csdn.net/xlxxcc/article/details/51106721)
    [jni 获取对象 string 类型属性](https://blog.csdn.net/xiuye2015/article/details/90111908)
-7. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
-8. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
-9. [三方库管理存储工具 Maven](https://www.cnblogs.com/zachary7/p/7975632.html)
+8. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
+9. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
+10. [三方库管理存储工具 Maven](https://www.cnblogs.com/zachary7/p/7975632.html)
 
 
 
@@ -69,7 +70,7 @@
 2. [adb logcat 的妙用（输出 log 到指定文件中）](https://blog.csdn.net/qq_34801506/article/details/81014994)
 3. `adb push path_compute path_mobile`：从电脑上传送文件到手机
    `adb pull path_mobile path_compute`：从手机传送文件到电脑上
-4. [系统自带的 GPU 呈现分析](https://www.cnblogs.com/ldq2016/p/6667381.html)
+4. [系统自带的 GPU 呈现分析](https://www.jianshu.com/p/ac2d58666106)
 5. [高通骁龙 Adreno GPU Profiler 调试工具（建议在 windows 下使用，mac 下测试无用）](https://gameinstitute.qq.com/community/detail/123051)
 6. [GAPID 调试 Android 应用，需要 Android stuido 停用 adb 的使用](http://www.geeks3d.com/20171214/google-gapid-capture-vulkan-and-opengl-es-calls-on-android-windows-macos-and-linux/)
 
