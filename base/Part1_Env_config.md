@@ -26,7 +26,15 @@ zsh
    # shell code ...
    ```
 
-2. 用命令直接切换当前调用 shell 命令的程序
+2. 每次执行时说明用哪个 shell 调用
+  本方法优先级大于 `#!` 可使 `#!` 指定使用的 shell 无效
+  
+  ```shell
+  sh ./shellScriptFile.sh
+  ```
+  
+3. 用命令直接切换默认调用 shell 命令的程序
+
   ```shell
   chsh -s /bin/bash
   chsh -s /bin/zsh

@@ -33,9 +33,10 @@
 
 ### 4. 存储
 
-1. [Android 文件外/内部存储的获取各种存储目录路径](https://www.jianshu.com/p/2de0113b3164)
+1. [SharedPreferences](https://www.jianshu.com/p/13f26d68b02e)
+2. [Android 文件外/内部存储的获取各种存储目录路径](https://www.jianshu.com/p/2de0113b3164)
    [Android中读取assets目录下的文件详细介绍](https://blog.csdn.net/greathfs/article/details/52123984)
-2. [NDK 下 AAssetManager](https://blog.csdn.net/u012098794/article/details/53405142)
+3. [NDK 下 AAssetManager](https://blog.csdn.net/u012098794/article/details/53405142)
 
 
 
@@ -61,6 +62,8 @@
 ### 6. 语法
 
 1. [android 不建议使用枚举类](https://www.cnblogs.com/zgz345/p/5871351.html)
+   [为什么推荐使用注解代替枚举](https://www.jianshu.com/p/80180e1728d0)
+   [什么是注解](https://www.cnblogs.com/liaojie970/p/7879917.html)
 
 
 
@@ -80,6 +83,10 @@
 
 ### 1. Xcode 使用
 
+1. [iOS 和 Xcode 的真机调试 版本匹配问题](https://www.jianshu.com/p/9e72bec04c06)
+2. [Storybroad 的使用](https://www.jianshu.com/p/aaa4b89dbba1)
+3. [Storybroad 比例布局](https://segmentfault.com/a/1190000002997979)
+
 
 
 
@@ -92,16 +99,29 @@
 
 ### 3. 相机
 
+1. [UIDevice](https://www.jianshu.com/p/aaa4b89dbba1)
+2. [相机 Demo](https://github.com/nanshanyi/photographDemo/blob/master/photographDemo/ViewController.m)
+3. [自定义相机](https://blog.csdn.net/qq_30513483/article/details/51198464)
+4. [AVCamManual 相机的曝光，白平衡](https://github.com/sri-omg/AVCamManual)
+5. [屏幕旋转 UIDeviceOrientation](https://www.jianshu.com/p/36bf3f9f2141)
+6. [iOS 视频采集编码前后显示汇总](https://www.jianshu.com/p/1a241674a075)
+7. [AVFoundation](https://www.jianshu.com/p/0537388ef8ef)
+8. [Drawing to Other Rendering Destinations](https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html#//apple_ref/doc/uid/TP40008793-CH103-SW1)
+9. [iOS 传感器与 CMMotionManager]()
+
 
 
 
 ### 4. 存储
 
 1. [iOS 目录结构](https://my.oschina.net/liuchuanfeng/blog/388338)
+2. [资源路径获取](https://blog.csdn.net/xuhuan_wh/article/details/7474310)
 
 
 
 ### 5. 编译
+
+1. [iOS开发中BitCode功能](https://www.jianshu.com/p/8eff48e5c010)
 
 
 
@@ -109,9 +129,15 @@
 
 1. [NSString / NSData / char* 类型之间的转换](https://www.cnblogs.com/pengyingh/articles/2341880.html)
 
+2. [iOS9 的几个新关键字（nonnull、nullable、null_resettable、__null_unspecified）](https://www.cnblogs.com/alan12138/p/5620021.html)
+
+3. [iOS 动画 —— transform](https://www.jianshu.com/p/3bc427f0dd56)
+
 
 
 ### 7. 调试
+
+1. [iOS lldb 调试命令](https://blog.csdn.net/ios_xumin/article/details/42711759)
 
 
 
@@ -131,3 +157,6 @@
 ### 6. 语法
 
 ### 7. 调试
+
+1. [获取 app ipa 资源](https://www.jianshu.com/p/009018d11648)
+

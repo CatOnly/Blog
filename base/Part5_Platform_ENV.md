@@ -53,7 +53,7 @@
 4. 如果 NDK 版本较新（大于 r12？）却使用了 `.mk` 来编译 C++ / C 文件
    由于 Google 正在推进使用 cmake 而非原来自家的 `.mk` 文件
    需要修改 gradle.properties 下的 `android.deprecatedNdkCompileLease=1558259721076`
-   这为了确保使用 `.mk` 而不是 cmake 的具体时间截止日期（首先使用 `android.useDeprecatedNdk=true` 获取到允许的时间，然后将 `android.deprecatedNdkCompileLease` 时间设为获取到的时间）
+   这为了确保使用 `.mk` 而不是 cmake 的具体时间截止日期（首先使用 `android.useDeprecatedNdk=true` 当 studio 在命令行报错时会给出一个允许的时间戳，然后将 `android.deprecatedNdkCompileLease` 时间设为获取到的时间）
 
 
 
@@ -76,6 +76,17 @@
 
 
 
+### 7. 硬件适配问题
+
+1. [CPU 32 位 和 64 位适配](https://blog.csdn.net/lyabc123456/article/details/81557220)
+2. [Neon 指令集 ARMv7/v8 对比](https://blog.csdn.net/zsc09_leaf/article/details/45825015)
+
+
+
+### 8. 其他
+
+1. 单独编译项目中的一个 model 查看的错误信息更详细
+
 
 
 ## 二、iOS 平台问题
@@ -94,4 +105,18 @@
 
 
 ### 3. clang 编译、连接问题
+
+
+
+### 4. 资源读取问题
+
+1. 图片资源优化问题
+   Xcode 工程直接放入图片文件，会将图片优化导致 其他三方库（例如 C++ 平台上的）无法直接读取图片资源
+   解决方法，将图片放入一个 bundle 中
+
+
+
+## 5. 包管理问题
+
+1. [cocoapods 快速更新](https://www.jianshu.com/p/e979f3398653)
 
