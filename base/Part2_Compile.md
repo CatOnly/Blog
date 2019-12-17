@@ -182,7 +182,9 @@ $ld -static crtl.o crti.o crtbeginT.o hello.o -start-group -lgcc -lgcc_eh -lc -e
 
 # 三、编译后数据的存储
 
-## 内存布局
+## 1. 文件存储
+
+## 2. 运行时内存布局
 
 
 

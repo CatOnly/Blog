@@ -4,6 +4,8 @@
 <p><h1><center>平台常用知识体系梳理</center></h1></p>
 > 宗旨，不要浪费时间在已有的工具/文章上，复用别人的工具/文章，让自己更专注于自己的领域
 
+
+
 ## 一、Android 平台
 
 ### 1. Android Studio 使用
@@ -86,6 +88,8 @@
 1. [iOS 和 Xcode 的真机调试 版本匹配问题](https://www.jianshu.com/p/9e72bec04c06)
 2. [Storybroad 的使用](https://www.jianshu.com/p/aaa4b89dbba1)
 3. [Storybroad 比例布局](https://segmentfault.com/a/1190000002997979)
+4. [Xcode 不升级添加 deivce support 文件](https://github.com/iGhibli/iOS-DeviceSupport/tree/master/DeviceSupport)
+5. [Xcode 垃圾清理](https://www.jianshu.com/p/225a4b3dd88e)
 
 
 
@@ -102,13 +106,13 @@
 1. [UIDevice](https://www.jianshu.com/p/aaa4b89dbba1)
 2. [相机 Demo](https://github.com/nanshanyi/photographDemo/blob/master/photographDemo/ViewController.m)
 3. [自定义相机](https://blog.csdn.net/qq_30513483/article/details/51198464)
-4. [AVCamManual 相机的曝光，白平衡](https://github.com/sri-omg/AVCamManual)
-5. [屏幕旋转 UIDeviceOrientation](https://www.jianshu.com/p/36bf3f9f2141)
-6. [iOS 视频采集编码前后显示汇总](https://www.jianshu.com/p/1a241674a075)
-7. [AVFoundation](https://www.jianshu.com/p/0537388ef8ef)
-8. [Drawing to Other Rendering Destinations](https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html#//apple_ref/doc/uid/TP40008793-CH103-SW1)
-9. [iOS 传感器与 CMMotionManager]()
-
+4. [iOS  官方 Demo AVCamManual 相机的曝光，白平衡](https://github.com/sri-omg/AVCamManual)
+5. [相机曝光、白平衡](https://docs.microsoft.com/zh-cn/xamarin/ios/user-interface/controls/intro-to-manual-camera-controls)
+6. [屏幕旋转 UIDeviceOrientation](https://www.jianshu.com/p/36bf3f9f2141)
+7. [iOS 视频采集编码前后显示汇总](https://www.jianshu.com/p/1a241674a075)
+8. [AVFoundation](https://www.jianshu.com/p/0537388ef8ef)
+9. [Drawing to Other Rendering Destinations](https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html#//apple_ref/doc/uid/TP40008793-CH103-SW1)
+10. [iOS 传感器与 CMMotionManager](https://blog.csdn.net/boring_cat/article/details/51153476)
 
 
 
@@ -121,23 +125,26 @@
 
 ### 5. 编译
 
-1. [iOS开发中BitCode功能](https://www.jianshu.com/p/8eff48e5c010)
+1. [LLVM 文档](https://releases.llvm.org/)
+2. [iOS开发中BitCode功能](https://www.jianshu.com/p/8eff48e5c010)
 
 
 
 ### 6. 语法
 
 1. [NSString / NSData / char* 类型之间的转换](https://www.cnblogs.com/pengyingh/articles/2341880.html)
-
-2. [iOS9 的几个新关键字（nonnull、nullable、null_resettable、__null_unspecified）](https://www.cnblogs.com/alan12138/p/5620021.html)
-
-3. [iOS 动画 —— transform](https://www.jianshu.com/p/3bc427f0dd56)
+2. [iOS BOOL 和 bool](https://www.jianshu.com/p/efe976b53560)
+3. [iOS9 的几个新关键字（nonnull、nullable、null_resettable、__null_unspecified）](https://www.cnblogs.com/alan12138/p/5620021.html)
+4. [iOS 动画 —— transform](https://www.jianshu.com/p/3bc427f0dd56)
 
 
 
 ### 7. 调试
 
 1. [iOS lldb 调试命令](https://blog.csdn.net/ios_xumin/article/details/42711759)
+2. [获取其他 APP 的 ipa](https://imazing.com/guides/how-to-manage-apps-without-itunes)
+3. [Xcode GPU debug](https://www.cnblogs.com/TracePlus/p/4093830.html)
+4. [获取 app ipa 资源](https://www.jianshu.com/p/009018d11648)
 
 
 
@@ -152,11 +159,13 @@
 
 ### 4. 存储
 
+- [Qt程序关于路径、用户目录路径、临时文件夹位置获取方法](https://www.cnblogs.com/icmzn/p/6953948.html)
+
+  
+
 ### 5. 编译
 
 ### 6. 语法
 
 ### 7. 调试
-
-1. [获取 app ipa 资源](https://www.jianshu.com/p/009018d11648)
 
