@@ -1,7 +1,7 @@
 [TOC]
 
 <h1><center> 相机工作原理</center></h1>
-# 一、曝光：调整进光量
+# 一、曝光：进光量调整
 
 ![](./images/exposure.png)
 
@@ -23,6 +23,7 @@
 - 手动快门速度，自动 ISO 和 光圈大小曝光：[S/Tv 快门优先](http://zh.wikipedia.org/wiki/快门优先)
 - 手动光圈大小，自动 ISO 和快门速度：[A/Av 光圈优先](http://zh.wikipedia.org/wiki/光圈优先)
 - 完全手动曝光：手动快门速度和 ISO 曝光 M
+- 曝光公式：[Want an Easier and Faster Way to Calculate the Exposure Formula?](https://nofilmschool.com/2018/03/want-easier-and-faster-way-calculate-exposure-formula)
 
 
 
@@ -118,13 +119,33 @@ ISO：[胶卷速度](http://zh.wikipedia.org/wiki/感光度)，图像传感器�
 
 
 
+# 四、应用
+
+## 1. iOS 相机 API 介绍
+
+- [Apple 官网 AVCaptureDevice 介绍](https://developer.apple.com/documentation/avfoundation/avcapturedevice?language=objc)
+- [OC 之 AVCaptureDevice](https://www.jianshu.com/p/155efb36e041)
+- [OC 之 AVCaptureDevice 续](https://www.jianshu.com/p/a9c500d74a4b)
+- [iOS camera: manual exposure duration but auto ISO?](https://stackoverflow.com/questions/29819515/ios-camera-manual-exposure-duration-but-auto-iso)
+- [iOS 中 ImageIO 框架详解与应用分析](https://www.jianshu.com/p/ab566a9ec174)
+- [iOS 的传感器系统](https://yq.aliyun.com/articles/614882)
+- [iOS CoreMotion 的使用](https://www.jianshu.com/p/9944c1f17d35)
+
+
+
+## 2. Android 相机 API 介绍
+
+
+
+
+
 
 
 # 引用
 
 1. [How Your Camera Works](http://www.objc.io/issue-21/how-your-camera-works.html)
 2. [在 Xamarin 中手动照相机控件](https://docs.microsoft.com/zh-cn/xamarin/ios/user-interface/controls/intro-to-manual-camera-controls)
-3. [iOS 上的相机捕捉](https://www.jianshu.com/p/59f8c695f6ed)
+3. [iOS 上的相机捕捉](https://objccn.io/issue-21-3/)
 4. [摄影入门之光圈](https://zhuanlan.zhihu.com/p/24076867)
 5. [摄影入门之快门](https://zhuanlan.zhihu.com/p/25375932)
 6. [摄影入门之感光度](https://zhuanlan.zhihu.com/p/25588177)

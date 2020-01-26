@@ -90,6 +90,9 @@
 3. [Storybroad 比例布局](https://segmentfault.com/a/1190000002997979)
 4. [Xcode 不升级添加 deivce support 文件](https://github.com/iGhibli/iOS-DeviceSupport/tree/master/DeviceSupport)
 5. [Xcode 垃圾清理](https://www.jianshu.com/p/225a4b3dd88e)
+6. [App Installation failed, No code signature found](https://blog.macrowolf.cn/31.html)
+7. [CocoaPods的常见使用方式](https://www.cnblogs.com/hs-funky/p/6759977.html)
+8. [自定义cocoapods库](https://www.jianshu.com/p/oZfb8s)
 
 
 
@@ -104,15 +107,24 @@
 ### 3. 相机
 
 1. [UIDevice](https://www.jianshu.com/p/aaa4b89dbba1)
-2. [相机 Demo](https://github.com/nanshanyi/photographDemo/blob/master/photographDemo/ViewController.m)
-3. [自定义相机](https://blog.csdn.net/qq_30513483/article/details/51198464)
-4. [iOS  官方 Demo AVCamManual 相机的曝光，白平衡](https://github.com/sri-omg/AVCamManual)
-5. [相机曝光、白平衡](https://docs.microsoft.com/zh-cn/xamarin/ios/user-interface/controls/intro-to-manual-camera-controls)
-6. [屏幕旋转 UIDeviceOrientation](https://www.jianshu.com/p/36bf3f9f2141)
-7. [iOS 视频采集编码前后显示汇总](https://www.jianshu.com/p/1a241674a075)
-8. [AVFoundation](https://www.jianshu.com/p/0537388ef8ef)
-9. [Drawing to Other Rendering Destinations](https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html#//apple_ref/doc/uid/TP40008793-CH103-SW1)
-10. [iOS 传感器与 CMMotionManager](https://blog.csdn.net/boring_cat/article/details/51153476)
+
+2. [自定义相机](https://blog.csdn.net/qq_30513483/article/details/51198464)
+
+3. [iOS  官方 Demo AVCamManual 相机的曝光，白平衡](https://github.com/sri-omg/AVCamManual)
+
+4. [相机曝光、白平衡](https://docs.microsoft.com/zh-cn/xamarin/ios/user-interface/controls/intro-to-manual-camera-controls)
+
+5. [屏幕旋转 UIDeviceOrientation](https://www.jianshu.com/p/36bf3f9f2141)
+
+6. [iOS 视频采集编码前后显示汇总](https://www.jianshu.com/p/1a241674a075)
+
+7. [AVFoundation](https://www.jianshu.com/p/0537388ef8ef)
+
+8. [Drawing to Other Rendering Destinations](https://developer.apple.com/library/archive/documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/WorkingwithEAGLContexts/WorkingwithEAGLContexts.html#//apple_ref/doc/uid/TP40008793-CH103-SW1)
+
+9. [iOS 传感器与 CMMotionManager](https://blog.csdn.net/boring_cat/article/details/51153476)
+
+10. [iOS camera: manual exposure duration but auto ISO?](https://stackoverflow.com/questions/29819515/ios-camera-manual-exposure-duration-but-auto-iso)
 
 
 
