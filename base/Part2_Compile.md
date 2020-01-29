@@ -247,13 +247,19 @@ $ld -static crtl.o crti.o crtbeginT.o hello.o -start-group -lgcc -lgcc_eh -lc -e
 
 ### 1.1 寄存器
 
+我们常常看到 32 位 CPU、64 位 CPU 这样的名称，其实指的就是寄存器的大小
+
 ![](./images/register.png)
 
 
-Intel 8086 芯片的寄存器存储格式
+
+**Intel 8086 芯片的寄存器存储格式**
+
+> 现代寄存器已经失去了过去和名字相符的功能，只留下一个名字来作为区分
 
 1. **8 个通用寄存器**
-![](./images/register2.png)
+  除了用名字上指定的功能，还能用做别的功能
+  ![](./images/register2.png)
 
 2. **4 个段寄存器**
   代码段寄存器：CS（Code Segment Register）存储代码段的段地址
@@ -273,10 +279,16 @@ Intel 8086 芯片的寄存器存储格式
 
 > 内存以字节为最小存储单位存取数据
 
-**Intel 8086 CPU 寻址分配**，以下地址逻辑上是连续的，实际上并不一定连续
+**Intel 8086 CPU 寻址分配**，以下地址逻辑上是连续的，实际上的物理地址并不一定连续
 
 ROM（Read-Only Memory）：只读内存，断电不会消失
 ![](./images/memory.png)
+
+
+
+**系统分配给每个程序的内存结构**
+
+![](./images/memory2.png)
 
 
 
@@ -355,6 +367,28 @@ make-standalone-tools.py
 
 
 
+**内嵌汇编代码**
+
+将系统调用封装在函数里
+
+```c
+void write(char* str)
+{
+  int len = 0;
+  for (char* cPtr = str; *cPtr++ != '\0'; ++len);
+  
+  __asm__(                  // __asm__ 标志符，GCC 编译时会识别
+    "mov rax, 1 \n\t"				// 汇编代码
+    "mov rdi, 1 \n\t"
+    "syscall \n\t"					// 系统调用
+    :
+    :"S"(str), "d"(len)
+  );
+}
+```
+
+
+
 
 ## 2. 阅读程序源文件
 
@@ -385,45 +419,242 @@ make-standalone-tools.py
 1   00000000 B83F00   mov ax,0x3f   ;这里是注释
 ```
 
+
+
 **汇编指令的存储**
+
 ![](./images/register4.png)
 
 
 
-## 4. Interl x86 架构汇编指令的语法
+## 4. Intel x86 架构汇编指令简介
 
-**指令 mov**
-
-- 功能：数据的传送（拷贝）
-- 格式：mov 目的操作数, 源操作数
-  例：`mov [0x04 + 0x02], 0x05`
-- 注意：
-  - 目的操作数和源操作数数据宽度必须一致
-  - 目的操作数和源操作数不能同时都为内存单元（硬件限制）
-  - 不允许数字直接传入到段寄存器中，可以通过以下中转来实现：
-    `mov 通用寄存器/内存单元, 数字`
-    `mov 段寄存器, 通用寄存器/内存单元`
+> 汇编语句不区分大小写
 
 
+
+### 4.1 指令的修饰词
 
 **标号**
 
-- 功能：代表当前汇编代码的汇编地址
-- 格式：命名规则以字母开头，采用**二进制存储**
+- 功能：代表当前汇编代码的汇编地址，命名规则以字母开头，采用**二进制存储**
+
+- 格式 1：标号 指令
   例：`number mov ax, 0x05`，其中 number 为标号
+  
+- 格式 2：标号：指令
+
+  ```assembly
+  ;例：这里的标号 start 代表指令 mov ax, 0x8c0 代码的汇编地址
+  start:            
+  	mov ax, 0x8c0
+  	mov ds,ax
+  	
+  data:
+  	db 0,0,0
+  	
+  text:
+  	db 1,1
+  	
+  	mov cx,(data-text)/2  ;源操作数 =（标号 data 的字节数 - text 的字节数）/ 2
+  ```
+
+
+
+**数据传送尺寸**
+
+- 功能：取固定长度数据到目的操作数，一般不加限制说明取可以填满目的操作数的长度
+
+- 例子：
+
+  ```assembly
+  mov BYTE PTR [ebx], 2	  ;移动源操作数为 1 byte 长度的 2，到寄存器 EBX 中
+  mov WORD PTR [ebx], 2	  ;移动源操作数为 1 word = 2 byte 长度的 2，到寄存器 EBX 中
+  mov DWORD PTR [ebx], 2  ;移动源操作数为 1 double word = 4 byte 长度的 2，到寄存器 EBX 中
+  ```
+
+
+
+**其他指令**
+
+```assembly
+;修改 PSW 微处理器状态字的 DF 标志位的值
+cld ;clear direction 将 DF 方向标志位清 0，正向
+std ;  set direction 将 DF 方向标志位设 1，反向
+
+;自增自减少，执行后会自动修改 PSW 微处理器状态字的 SF 符号标志位的值 = (目的操作数 == 0 ? 0 : 1)
+inc 目的操作数 ;increase 目的操作数 = 目的操作数 + 1
+dec 目的操作数 ;decrease 目的操作数 = 目的操作数 - 1
+```
+
+
+
+### 4.2 伪指令
+
+> 伪指令，编译器编译后，指令被替换为相应的值，不会被编译成机器指令（类似于宏定义）
 
 
 
 **指令 db**
 
-- 功能：控制编译器，声明并初始化数据
-  属于伪指令，编译器编译后，只留下 db 后的数据作为占位符
+- 功能：声明并初始化数据
+  编译器编译后，只留下 db 后的数据作为占位符
+  
 - 格式：db 数字1, 数字2 （其中声明的每个数字占用 1 个 byte 的宽度）
-  例：`db 0, 4, 124`
+  
+  ```assembly
+  ;例，其中 \ 表示让编译器编译时将当前行和下一行合并为同一行
+  db 0,4,124,'L',0x07,\
+  	 0,4,124,':',0x07,\
+  	 0,4,124,'0',0x07
+  ```
+  
 - 类似的指令：
   dw（word，声明的每个数占用 1 word = 2 byte 的宽度）
   dd（double word，声明的每个数占用 2 word = 4 byte 的宽度）
   dq（quad word，声明的每个数占用 4 word = 8 byte 的宽度）
+
+
+
+**指令 times**
+
+- 功能：让编译器重复生成后面指令多少次
+- 格式：times 重复次数 其他指令
+  例：`times 255 db 0`，让编译器重复生成指令 db 0，共 255 次
+
+
+
+### 4.3 传送指令
+
+**指令 mov**
+
+- 功能：数据的传送（拷贝）
+
+- 格式：mov 目的操作数, 源操作数，例
+  
+  ```assembly
+  mov [0x04 + 0x02],0x05mov ax,'D' ;表示将 D 的 ACSII 码值存入 ax 中
+  mov byte [es:0x1a], al ;es:0x1a == 段地址 + 偏移地址 (0x1a)
+  mov byte [bx], al ;[bx] == [ds:bx] == 默认的代码段地址 + 偏移地址 (bx 的值)
+  
+  ;注意：
+  ; 1.目的操作数和源操作数数据宽度必须一致
+  ; 2.目的操作数和源操作数不能同时都为内存单元（硬件限制）
+  ; 3.不允许数字直接传入到段寄存器中，可以通过以下中转来实现：
+      mov 通用寄存器/内存单元, 数字
+      mov 段寄存器, 通用寄存器/内存单元
+  ```
+
+
+
+**指令 movsb**（byte），**movsw**（word）
+
+- 功能：目的操作数的批量传送
+
+- 格式：
+
+  ```assembly
+  ;该指令后面不需要任何操作数
+  ;以下 SI 和 DI 的正负值取决于 PSW 微处理器状态字的 DF 标志位的值
+  ;传送的目的：DS 数据段寄存器 + SI 源变址寄存器（地址偏移）
+  ;传送的源：ES 附加段寄存器 + DI 目的变址寄存器（地址偏移）
+  ;传送的次数：CX 累计寄存器中的值
+  
+  ;格式 1：只传送一次
+  movsb
+  movsw
+  
+  ;格式 2：每传送一次 CX 累计寄存器自动减一（repeat）
+  ;如果 CX 累计寄存器中的值不是 0，PSW 微处理器状态字的 ZF 标志位的值为 0，会继续传送数据
+  ;如果 CX 累计寄存器中的值是 0，PSW 微处理器状态字的 ZF 标志位的值为 1，不会继续传送数据
+  rep movsb
+  rep movsw
+  ```
+
+  
+
+**指令 push**
+
+- 功能：将目的操作数里的数据存入内存的栈中，并让 SP 栈寄存器地址增加
+- 格式：push 目的操作数
+
+
+
+**指令 pop**
+
+- 功能：取出内存的栈顶数据，写入目的操作数中，并让 SP 栈寄存器地址回退
+- 格式：pop 目的操作数
+
+
+
+
+
+### 4.4 流程控制指令
+
+**JCC 指令族**（Jump Conditional Code）
+
+![](./images/jcc.png)
+
+
+
+**指令 jmp**
+
+- 功能：跳转指令执行地址
+
+- 格式 1：jmp CS 代码段地址, IP 偏移地址
+
+- 格式 2：infi jmp near infi
+  ```assembly
+  ;跳转的原理
+  ;修改 IP 偏移地址寄存器的值，使
+  ;IP 偏移地址 = IP 偏移地址 + 该指令的操作数 + 该指令的长度
+  
+  ;操作数 = 标号的汇编地址 - 当前指令的汇编地址 - 当前机器指令的字节长度
+  
+  ;因此这条指令会使处理器卡在该指令，陷入无线循环跳转状态
+  infi ;标号，代表当前汇编代码的汇编地址
+  near ;修饰符，表示操作数（见上文，汇编的阅读格式）是 16 位的长度
+  ```
+
+
+
+**指令 jns**
+
+- 功能：根据 PSW 微处理器状态字的 SF 符号标志位的值来决定是否跳转到标号位置（ SF == 1 跳转）
+- 格式：jns 标号名称
+
+
+
+**指令 loop**
+
+- 功能：循环执行标号位置，循环前会判断 CX 累积寄存器是否是 0，如果不为 0 继续跳转标号地址
+  **跳转的原理和 jmp 指令一致，都是修改了 IP 偏移地址寄存器的值**
+- 格式：loop 标号名称
+
+
+
+**指令 call**
+
+- 功能：调用函数，跳转到函数名对应的标签
+- 格式：call 函数名标签
+
+
+
+**指令 ret**
+
+- 功能：终止当前函数的执行，将运行权交还给上层函数
+- 格式：ret
+
+
+
+
+
+### 4.5 逻辑运算指令
+
+**指令 xor**
+
+- 功能：对目的操作数和源操作数做异或运算，最后存储到目的操作数中
+- 格式：xor 目的操作数, 源操作数
 
 
 
@@ -436,12 +667,71 @@ make-standalone-tools.py
 
 
 
-**指令 xor**
+**指令 add**
 
-- 功能：对目的操作数和源操作数做异或运算，最后存储到目的操作数中
-- 格式：xor 目的操作数, 源操作数
+- 功能：目的操作数 = 目的操作数 + 源操作数
+- 格式：add 目的操作数, 源操作数
 
 
+
+**指令 sub**
+
+- 功能：目的操作数 = 目的操作数 - 源操作数
+- 格式：sub 目的操作数，源操作数
+
+
+
+**指令 cmp**
+
+- 功能：对目的操作数和源操作数相减 PSW 微处理器状态字的标志位里** = 
+- 格式：
+
+
+
+### 4.6 应用
+
+1. C 代码，存储在 example.c 文件中
+
+   ```c
+   int add_a_and_b(int a, int b) {
+      return a + b;
+   }
+   
+   int main() {
+      return add_a_and_b(2, 3);
+   }
+   ```
+
+   
+
+2. GCC 将 C 代码转换为汇编语言
+
+   ```shell
+   gcc -S example.c
+   ```
+
+   
+
+3. 汇编源文件
+
+   ```assembly
+   _add_a_and_b:
+      push   %ebx
+      mov    %eax, [%esp+8] 
+      mov    %ebx, [%esp+12]
+      add    %eax, %ebx 
+      pop    %ebx 
+      ret  
+   
+   _main:
+      push   3
+      push   2
+      call   _add_a_and_b 
+      add    %esp, 8
+      ret
+   ```
+
+   
 
 
 
@@ -451,4 +741,7 @@ make-standalone-tools.py
 - [Recursive Make Considered Harmful](http://aegis.sourceforge.net/auug97.pdf)
 - [Building C Projects](http://nethack4.org/blog/building-c.html)
 - [Precompiled headers](http://itscompiling.eu/2017/01/12/precompiled-headers-cpp-compilation/)
+- [x86 Assembly Guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html)
 - [C 语言中 .h 和 .c 文件解析](https://www.cnblogs.com/laojie4321/archive/2012/03/30/2425015.html)
+- [汇编语言入门教程，阮一峰](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
+- [为什么寄存器比内存快？](http://www.ruanyifeng.com/blog/2013/10/register.html)
