@@ -252,7 +252,7 @@ $ld -static crtl.o crti.o crtbeginT.o hello.o -start-group -lgcc -lgcc_eh -lc -e
 
 
 
-**内嵌汇编代码**
+**内联汇编代码**
 
 将系统调用封装在函数里
 
@@ -405,6 +405,8 @@ ROM（Read-Only Memory）：只读内存，断电不会消失
 **汇编指令的存储**
 
 ![](./images/register4.png)
+
+
 
 
 
@@ -760,12 +762,12 @@ dec 目的操作数 ;decrease 目的操作数 = 目的操作数 - 1
 
    
 
-3. 汇编源文件
+3. 汇编源文件（以下为现代汇编语言可能和 x86 汇编语言有所不同）
 
    ```assembly
    _add_a_and_b:
-      push   %ebx
-      mov    %eax, [%esp+8] 
+      push   %ebx							;% 表示这是个寄存器
+      mov    %eax, [%esp+8] 		;e 表示 extend 意思是扩展到了 32 位，以前是 16 位，叫 %ax
       mov    %ebx, [%esp+12]
       add    %eax, %ebx 
       pop    %ebx 
@@ -790,6 +792,7 @@ dec 目的操作数 ;decrease 目的操作数 = 目的操作数 - 1
 - [Building C Projects](http://nethack4.org/blog/building-c.html)
 - [Precompiled headers](http://itscompiling.eu/2017/01/12/precompiled-headers-cpp-compilation/)
 - [x86 Assembly Guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html)
+- [The Art of Picking Intel Registers](https://www.swansontec.com/sregisters.html)
 - [C 语言中 .h 和 .c 文件解析](https://www.cnblogs.com/laojie4321/archive/2012/03/30/2425015.html)
 - [汇编语言入门教程，阮一峰](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
 - [为什么寄存器比内存快？](http://www.ruanyifeng.com/blog/2013/10/register.html)
