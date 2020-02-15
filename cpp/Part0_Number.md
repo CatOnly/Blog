@@ -227,6 +227,15 @@
 > C++ 程序中判断 0.1 + 0.2 和 0.3 往往是不相等的
 > 通常通过 `fabs((0.1 + 0.2) - 0.3) < FLT_EPSLION` 来判断，这主要与浮点数的表示有关
 
+为了弥补计算的精度损失常用 FLT_EPSLION 来弥补（epslion，简称 EPS 代表一个无穷小的量，常取值为 1e-10 ~1e-8 之间）
+
+例：以下两个数都表示 0.5，通过 + FLT_EPSLION 来使两个数**更接近真实存储的数**
+
+- 4.9999999999999998 + 0.0000 0001 =
+  0.5000000099999998
+- 5.000000000000001+ 0.00000001 =
+  0.500000010000001
+
 
 
 ## 1. 浮点数的结构
@@ -376,15 +385,11 @@ $$
 
 # 参考
 
-- 原码，补码，反码 http://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html
-
-- 移码 https://blog.csdn.net/williamgavin/article/details/78709938
-
-- Swift 的运算符 https://docs.swift.org/swift-book/LanguageGuide/AdvancedOperators.html
-
-- IEEE 标准浮点运算 https://en.wikipedia.org/wiki/IEEE_754
-
-- IEEE Standard 754 Floating Point Numbers http://steve.hollasch.net/cgindex/coding/ieeefloat.html
+- [原码，补码，反码](http://www.cnblogs.com/zhangziqiu/archive/2011/03/30/ComputerCode.html)
+- [移码](https://blog.csdn.net/williamgavin/article/details/78709938)
+- [Swift 的运算符](https://docs.swift.org/swift-book/LanguageGuide/AdvancedOperators.html)
+- [IEEE 标准浮点运算](https://en.wikipedia.org/wiki/IEEE_754)
+- [IEEE Standard 754 Floating Point Numbers](http://steve.hollasch.net/cgindex/coding/ieeefloat.html)
 
 
 
