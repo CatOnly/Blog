@@ -182,9 +182,21 @@ Linux 中只有任务 Task，没有线程和进程的实体
 
 
 
+## 4. 延伸：时钟和计时器
+
+
+
+
+
+
+
 # 二、线程安全
 
 原子操作：不会被系统的线程调度打断的操作，例 C 或 C++ 代码的原子操作编译成汇编的机器代码后**是一条汇编指令**
+
+内核只与线程交互，并不关心交互的线程是否在同一进程
+
+**系统调用和硬件中断会导致线程优先级的重新调度**
 
 
 
@@ -220,7 +232,7 @@ Linux 中只有任务 Task，没有线程和进程的实体
 
 一个线程使用一个 互斥锁 Mutex 对象，一旦 A 线程将 Mutex  B 对象 lock，其他线程将无法获得 Mutex B 对象，直到 A 线程将 B 对象设置为 unlock 状态
 
-**作用域：同一线程内**
+**作用域：同一进程内**（POSIX 标准，但其他 UNIX 系统可扩展这个标准，让 Mutex 作用域在不同的进程里，例：Neutrino 系统）
 同一个互斥锁：谁获取，谁释放
 
 相比二元信号量，互斥锁解决了[线程执行过程中优先级颠倒的问题](https://www.cnblogs.com/codescrew/p/8970514.html)
@@ -288,35 +300,158 @@ int pthread_rwlock_unlock(pthread_rwlock_t *lock);
 
 ## 7. 睡眠锁 Sleepon Lock
 
+睡眠锁
+
+- 当多个线程中都等待同一事件触发时使用的锁
+- 内部动态创建条件变量来对应想要同步的多个共享对象
+
 
 
 C++ 标准库中规定的睡眠锁
 
 ```c++
 int pthread_sleepon_lock(void);
-
 int pthread_sleepon_unlock(void);
 
-int pthread_sleepon_broadcast(void *addr);
+int pthread_sleepon_wait(void *addr);
 
 int pthread_sleepon_signal(void *addr);
-
-int pthread_sleepon_wait(void *addr);
+int pthread_sleepon_broadcast(void *addr);
 ```
+
+
+
+睡眠锁是基于条件变量的封装，例：
+
+```c++
+#include <stdio.h>
+#include <pthread.h>
+
+volatile int data_ready = 0;
+
+void consumer() {
+  printf("In consumer thread...\n");
+  while(1) {
+    pthread_sleepon_lock();
+  	while(!data_ready) {
+    	pthread_sleepon_wait(&data_ready);
+    }
+    // process data
+    printf("consumer: got data from producer\n");
+    data_ready = 0;
+		pthread_sleepon_unlock();
+  }
+}
+
+void producer() {
+    printf("In producer thread...\n");
+    while(1) {
+        // wait for interrupt from hardware here...
+        printf ("producer: got data from h/w\n");
+        pthread_sleepon_lock();
+        data_ready = 1;
+        pthread_sleepon_signal(&data_ready); // 唤醒优先级最高的一个线程来处理获得的数据
+      																			 // pthread_sleepon_broadcast 唤醒所有线程
+        pthread_sleepon_unlock();
+    }
+}
+
+int main() {
+    printf ("Starting consumer/producer example...\n");
+
+    // create the producer and consumer threads
+    pthread_create(NULL, NULL, producer, NULL);
+    pthread_create(NULL, NULL, consumer, NULL);
+
+    // let the threads run for a bit
+    sleep (20);
+}
+```
+
+
 
 
 
 ## 8. 条件变量 Condition variables
 
+条件变量（缩写：condvars）
+
+- 一个条件变量同步一个共享对象，想同步多个共享对象，需要一个个创建对应的条件变量
+
+
+
+模拟睡眠锁功能的条件变量实现：
+
+```c++
+#include <stdio.h>
+#include <pthread.h>
+
+volatile int data_ready = 0;
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t condvar = PTHREAD_COND_INITIALIZER; // 与 data_ready 对应
+
+void consumer() {
+    printf ("In consumer thread...\n");
+    while(1) {
+        pthread_mutex_lock(&mutex);
+        while(!data_ready) {
+            pthread_cond_wait(&condvar, &mutex);
+        }
+        // process data
+        printf("consumer:  got data from producer\n");
+        data_ready = 0;
+        pthread_cond_signal(&condvar);
+        pthread_mutex_unlock(&mutex);
+    }
+}
+
+void producer() {
+    printf ("In producer thread...\n");
+    while(1) {
+        // wait for interrupt from hardware here...          
+        printf("producer:  got data from h/w\n");
+        pthread_mutex_lock(&mutex);
+        while (data_ready) {
+            pthread_cond_wait(&condvar, &mutex);
+        }
+        data_ready = 1;
+        pthread_cond_signal(&condvar); // 唤醒优先级最高的一个线程来处理获得的数据
+      																 // pthread_cond_broadcast 唤醒所有线程
+        pthread_mutex_unlock(&mutex);
+    }
+}
+
+int main() {
+    printf("Starting consumer/producer example...\n");
+
+    // create the producer and consumer threads
+    pthread_create(NULL, NULL, producer, NULL);
+    pthread_create(NULL, NULL, consumer, NULL);
+
+    // let the threads run for a bit
+    sleep (20);
+}
+```
+
+
+
 
 
 ## 9. 线程池 thread Pool
 
+在服务器中，经常会遇到 1.创建线程 2.等待请求 3.销毁线程 4.在创建线程防止遗漏的请求未处理
+为了节省内存和不断创建销毁线程所占用的时间，需要使用线程池来解决这个问题
+
+
+
+## 10. 中断 interrupts
 
 
 
 
-## 10. 防止编译器过度优化
+
+## 11. 防止编译器过度优化
 
 CPU 的动态调度：在执行程序的时候，为了提高效率有可能**交换指令的执行顺序**
 编译器在进行优化的时候，可能为了效率而交换毫不相干的两条相邻指令的执行顺序
