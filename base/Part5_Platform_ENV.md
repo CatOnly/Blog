@@ -111,7 +111,7 @@
 
 ### 3. clang 编译、连接问题
 
-
+- [解决低版本 Xcode 不支持高版本 iOS 真机调试的问题](https://blog.csdn.net/xiangzhihong8/article/details/78360091)
 
 
 

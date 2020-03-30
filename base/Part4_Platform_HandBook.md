@@ -29,6 +29,8 @@
 
 1. [Android四大组件：这是一份全面 & 详细的Activity学习指南](https://blog.csdn.net/carson_ho/article/details/82848840)
 2. [Camera2 简介](https://www.jianshu.com/p/23e8789fbc10)
+3. [手机旋转角度](https://www.jianshu.com/p/f2cce22280df)
+4. [SensorManager](https://developer.android.google.cn/reference/android/hardware/SensorManager)
 
 
 
@@ -48,6 +50,7 @@
 1. [如何将Android studio 的项目变成Lib工程，供项目使用](https://blog.csdn.net/qq_33373648/article/details/75671402)
 2. [Android 调用so库全过程](https://blog.csdn.net/liujian8654562/article/details/78717149)
 3. [JNI 接口编写](https://www.cnblogs.com/rocomp/p/4892866.html)
+   [JNI 手册](https://blog.csdn.net/eydwyz/article/details/77800867)
    [JNI API 介绍](https://blog.csdn.net/yuzhou_zang/article/details/78410632)
 4. [aar 介绍](https://blog.csdn.net/xiexiangyu92/article/details/75200091)
    [aar = jar + so 介绍](https://blog.csdn.net/mq2856992713/article/details/77619299)
@@ -89,10 +92,13 @@
 2. [Storybroad 的使用](https://www.jianshu.com/p/aaa4b89dbba1)
 3. [Storybroad 比例布局](https://segmentfault.com/a/1190000002997979)
 4. [Xcode 不升级添加 deivce support 文件](https://github.com/iGhibli/iOS-DeviceSupport/tree/master/DeviceSupport)
-5. [Xcode 垃圾清理](https://www.jianshu.com/p/225a4b3dd88e)
-6. [App Installation failed, No code signature found](https://blog.macrowolf.cn/31.html)
-7. [CocoaPods的常见使用方式](https://www.cnblogs.com/hs-funky/p/6759977.html)
-8. [自定义cocoapods库](https://www.jianshu.com/p/oZfb8s)
+5. [Could not launch app 解决办法](https://blog.csdn.net/u012581760/article/details/78528480?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
+6. [Xcode 垃圾清理](https://www.jianshu.com/p/225a4b3dd88e)
+7. [App Installation failed, No code signature found](https://blog.macrowolf.cn/31.html)
+8. [CocoaPods的常见使用方式](https://www.cnblogs.com/hs-funky/p/6759977.html)
+9. [自定义cocoapods库](https://www.jianshu.com/p/oZfb8s)
+10. 装新的描述文件时，需要删掉旧的描述文件，位置在：
+    `cd ~/Library/MobileDevice/Provisioning Profiles/`
 
 
 
