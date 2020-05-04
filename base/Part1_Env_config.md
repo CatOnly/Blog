@@ -27,18 +27,18 @@ zsh
    ```
 
 2. 每次执行时说明用哪个 shell 调用
-  本方法优先级大于 `#!` 可使 `#!` 指定使用的 shell 无效
-  
-  ```shell
-  sh ./shellScriptFile.sh
-  ```
-  
+    本方法优先级大于 `#!` 可使 `#!` 指定使用的 shell 无效
+
+    ```shell
+    sh ./shellScriptFile.sh
+    ```
+
 3. 用命令直接切换默认调用 shell 命令的程序
 
-  ```shell
-  chsh -s /bin/bash
-  chsh -s /bin/zsh
-  ```
+    ```shell
+    chsh -s /bin/bash
+    chsh -s /bin/zsh
+    ```
 
 
 
@@ -89,14 +89,14 @@ zsh
 **login shell**
 
 1. login shell
-2. 读取并执行  `/etc/bashrc`  文件（所有用户的公关配置）
+2. 读取并执行  `/etc/bashrc`  文件（所有用户的公共配置）
 3. 读取并执行 `/etc/profile` 文件（所有用户的公共配置）
 4. **如果是 linux 系统而非 mac 系统**
    读取并执行 ` /etc/profile.d/*.sh`
 5. 查找  `~/.bash_profile`  文件，如果存在执行  `~/.bash_profile` ，如果不存在
-  查找  `~/.bash_login`  文件，如果存在执行  `~/.bash_login` ，如果还不存在
-  查找  `~/.profile`  文件，如果存在执行  `~/.profile` 
-  （当前用户的配置，**如果是 zsh 会先查找** `~/.zshrc`）
+    查找  `~/.bash_login`  文件，如果存在执行  `~/.bash_login` ，如果还不存在
+    查找  `~/.profile`  文件，如果存在执行  `~/.profile` 
+    （当前用户的配置，**如果是 zsh 会先查找** `~/.zshrc`）
 
 **non-login shell**
 

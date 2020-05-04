@@ -135,7 +135,12 @@ ISO：[胶卷速度](http://zh.wikipedia.org/wiki/感光度)，图像传感器�
 
 ## 2. Android 相机 API 介绍
 
-
+- [Android 官网 API](https://developer.android.google.cn/reference/android/hardware/Camera#setDisplayOrientation(int))
+- [相机开发（聚焦、横竖屏拍照、照片存储、连续拍照等）](https://blog.csdn.net/itbailei/article/details/38822791)
+- [Camera2 简介](https://www.jianshu.com/p/23e8789fbc10)
+- [手机旋转角度](https://www.jianshu.com/p/f2cce22280df)
+- [SensorManager](https://developer.android.google.cn/reference/android/hardware/SensorManager)
+- [Android 相机开发那些坑](https://zhuanlan.zhihu.com/p/20559606)
 
 
 
