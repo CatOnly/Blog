@@ -14,12 +14,11 @@
 
 
 
-
-###2. Android 项目工程文件
+### 2. Android 项目工程文件
 
 1. [Android 程序入口以及项目文件夹的含义](https://www.cnblogs.com/mingjiatang/p/5978538.html)
 2. [gradle 配置](https://www.cnblogs.com/wxishang1991/p/5457878.html)
-  [gradle 参数解释](https://www.jianshu.com/p/c11862136abf)
+    [gradle 参数解释](https://www.jianshu.com/p/c11862136abf)
   [gradle 项目构建](https://www.cnblogs.com/smyhvae/p/4456420.html)
 
 
@@ -61,6 +60,7 @@
 8. [NDK 开发](https://blog.csdn.net/afei__/article/details/81290711)
 9. [Java 成员变量为 C++ 的指针对象 / 智能指针对象](https://www.studiofuga.com/2017/03/10/a-c-smart-pointer-wrapper-for-use-with-jni/)
 10. [三方库管理存储工具 Maven](https://www.cnblogs.com/zachary7/p/7975632.html)
+11. [C++ Hook Java 代码](https://zhuanlan.zhihu.com/p/109157321)
 
 
 
@@ -69,6 +69,7 @@
 1. [android 不建议使用枚举类](https://www.cnblogs.com/zgz345/p/5871351.html)
    [为什么推荐使用注解代替枚举](https://www.jianshu.com/p/80180e1728d0)
    [什么是注解](https://www.cnblogs.com/liaojie970/p/7879917.html)
+2. [Java 的反射和动态代理](https://www.cnblogs.com/jingmoxukong/p/12049112.html)
 
 
 
