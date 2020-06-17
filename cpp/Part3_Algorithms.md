@@ -35,6 +35,8 @@
 - 由于对数可以互相转换 $log_{10}n = log_{10}2 \cdot log_2n = C_{常数}log_2n$
 
   不管是以 2 为底、以 3 为底，还是以 10 为底复杂度都计做 logn
+  
+- 时间复杂度 logn，不管问题 n 有多大，最后 logn 总会维持在一个较小的范围下，如下图
 
 <img src="./images/asymptotic_time_complexity.png" style="zoom:67%;" />
 
@@ -407,13 +409,24 @@ void __merge(int* arr, int p, int q, int r)
 
 ![](./images/quick_sort.png)
 
-采用分而治之的思想，在序列中选择任意一个数为分区点（Pivot），遍历当前序列，将小于分区点的数据放在其前面，大于分区点的数据放在其后面，然后前后分区重新选择新的分区点，不断细分，最后不能分了之后排序就完成了
+采用分而治之的思想，在序列中选择任意一个数为分区点（Pivot），遍历当前序列，将小于分区点的数据放在其前面，大于分区点的数据放在其后面，之后前后分区重新选择新的分区点，不断细分，最后到不能划分后，排序完成
 
 - 不是稳定排序
+
 - 空间复杂度 $O(1)$
+
 - 时间复杂度
   最好 $O(nlogn)$
   最坏 $O(n^2)$ （区分点选择不当）
+
+
+
+优化，主要是优化区分点的选择
+
+1. 三数取中
+   从区间的首、尾、中间，分别取出一个数，然后对比大小，取这 3 个数的中间值作为分区点
+2. 随机法
+   每次从要排序的区间中，随机选择一个元素作为分区点
 
 ```c
 void quick_sort(int *arr, int size)
@@ -450,28 +463,300 @@ int partition(int *arr, int p, int r)
 
 
 
-
-
 ## 2. 线性排序
 
 排序算法的时间复杂度是线性的，对排序的数据要求苛刻
+<u>线性排序比较强调数据的范围，范围不等同于大小，一组很大的数，他们的范围可以很小</u>
 
 ### 2.1 桶排序
 
+把含有的 n 个数据的数组，均匀地划分到 m 个数组（桶）内，每个数组内部使用快速排序，最后重新合并为一个数组（如果划分后，某个数组的数据仍过多，可单独将这个数组继续划分）
+
+- 不是稳定排序
+- 空间复杂度 $O(n)$
+- 时间复杂度
+  平均 $O(nlog{n \over m}) = O(m * {n \over m} * log{n \over m})$
+  最好 $O(n)$，当 m 和 n 接近时
+
+
+
+**使用桶排序的前置条件**
+
+1. 数组的数据可以被均匀的划分为几个数组（极端情况，都被划分为一个桶里，桶排序会退化为一个快速排序）
+
+2. 数组划分为几个数组后，数组间的顺序要求已经排好了，不需要数组间在重新排序
+
+   
+
+**适用场景**
+
 桶排序比较适合用在外部排序中
 外部排序就是数据存储在外部磁盘中，数据量比较大，内存有限，无法将数据全部加载到内存中
+
+```c++
+#include <algorithm>
+#include <iterator>
+
+template <size_t BucketSize,
+          typename IterT,
+          typename T = typename std::iterator_traits<IterT>::value_type,
+          typename Compare = std::less<T>>
+void bucket_sort(IterT first, IterT last, Compare comp = Compare()) {
+    const T min = *std::min_element(first, last);
+    const T max = *std::max_element(first, last);
+    const T range = max + 1 - min;
+    const size_t bucket_num = (range - 1) / BucketSize + 1;
+
+    std::vector<std::vector<T>> buckets(bucket_num);
+    for (auto b : buckets) {
+        b.reserve(2 * BucketSize);
+    }
+
+    for (IterT i = first; i != last; ++i) {
+        size_t idx = (*i - min) / BucketSize;
+        buckets[idx].emplace_back(*i);
+    }
+
+    IterT dest = first;
+    for (auto b : buckets) {
+        std::sort(b.begin(), b.end(), comp);
+        std::copy(b.begin(), b.end(), dest);
+        dest += b.size();
+    }
+
+    return;
+}
+```
 
 
 
 ### 2.2 计数排序
 
+![](./images/sort_counting.png)
 
+计数排序是桶排序的特殊情况，把含有的 n 个数据的数组，均匀地划分到 m 个数组（桶）内，**每个数组内部的数据都相同**
+
+- 稳定排序（必须从后向前遍历）
+- 空间复杂度 $O(n)$
+- 时间复杂度 $O(n)$
+
+
+
+**使用计数排序的前置条件**
+
+1. 只能用在数据范围不大的场景中，如果数据范围 k 比要排序的数据个数 n 大很多，不适合用计数排序
+2. 只能给非负整数排序，如果要排序的数据是其他类型的，要将其在不改变相对大小的情况下，转化为非负整数
+
+
+
+**适用场景**
+
+排序的数据范围小
+
+```c++
+#include <algorithm>
+#include <iterator>
+
+template <typename IterT,
+          typename T = typename std::iterator_traits<IterT>::value_type>
+void counting_sort(IterT first, IterT last) {
+    const auto len = std::distance(first, last);
+    if (len < 2) return;
+
+    const T max = *std::max_element(first, last);
+    if (max == 0) return;
+
+    std::vector<size_t> counter(max + 1);
+    // 记录每个数对应的个数
+    for (IterT i = first; i != last; ++i) {
+        ++counter[*i];
+    }
+    // 记录小于当前数的个数
+    for (size_t i = 1; i < counter.size(); ++i) {
+        counter[i] += counter[i - 1];
+    }
+
+    std::vector<T> temp(len);
+    // 根据计数表，从后向前遍历原数组（确保稳定排序），生成一个新的排序后的数组
+    for (IterT i = last - 1; i >= first; --i) {
+        temp[counter[*i] - 1] = *i;
+        --counter[*i];
+    }
+    std::copy(temp.begin(), temp.end(), first);
+}
+
+// 测试函数
+template <typename Container,
+          typename T = typename Container::value_type>
+void test_counting_sort(Container cont) {
+    counting_sort(cont.begin(), cont.end());
+    std::transform(cont.begin(), 
+                   cont.end(), 
+                   std::ostream_iterator<T>(std::cout, " "),
+                   [](T i){ return i; });
+    std::cout << std::endl;
+}
+```
 
 
 
 ### 2.3 基数排序
 
+![](./images/radix_sort.jpg)
 
+在一些较大的数组成的数组里，通过**逐个比较**不同数同一位数字（基数）的大小来进行排序
+
+- 稳定排序（必须从后向前遍历）
+- 空间复杂度 $O(1)$
+- 时间复杂度 $O(n) = O(C_{位数} * n)$
+
+
+
+**使用基数排序的前置条件**
+
+1. 数组里的数据可以按位划分
+2. 位之间有递进的关系
+   如果 a 数据的高位比 b 数据大，那剩下的低位就不用比较了
+3. 每一位的数据**范围**不能太大，要可以用线性排序算法来排序
+
+
+
+**适用场景**
+
+- 单词在字典中的排序
+  所有的单词补齐到相同长度，位数不够的可以在后面补 0
+  ASCII 值所有字母大于 0，补 0 不会影响原有的顺序
+- 手机号排序
+  手机号要是看作一个数的话，即便位数要相同，数据的范围会很大
+  使用基数排序，会细分手机号的分布范围，从而提高排序效率
+
+```c++
+#include <math.h>
+
+void radix_sort(int a[], int len, int digit_max)
+{
+	int *tmp = (int *)std::malloc(sizeof(int)*len);
+	assert(nullptr != tmp);
+
+  int digit = 1;
+	int counter[10];
+	for (int i = 0, j = 0, k = 0; i < digit_max; ++i) {
+    memset(counter, 0, sizeof(int)*10);
+    
+    // 从后向前遍历原数的位数（确保稳定排序）
+    digit = pow(10, i);
+    
+    for (j = 0; j < len; ++j) {
+			k = (a[j] / digit) % 10;
+			++counter[k];
+		}
+		for(j = 1; j < 10; ++j) {
+			counter[j] += counter[j-1];
+		}
+
+    // 从后向前遍历原数组（确保稳定排序）
+		for(j = len - 1; j >= 0; --j) {
+			k = (a[j] / digit) % 10;
+      tmp[counter[k] - 1] = a[j];
+			--counter[k];
+		}
+    
+    memcpy(a, tmp, sizeof(int)*len);
+	}
+
+}
+```
+
+
+
+# 三、查找
+
+## 1. 二分查找
+
+空间复杂度 $O(1)$
+
+时间复杂度 $O(logn)$
+其中 ${n \over 2^k}=1$ 时，k 的值就是总共缩小的次数，即时间复杂度
+
+
+
+**使用二分查找的前置条件**
+
+1. 二分查找依赖于数组这种连续内存的数据结构
+   查找数据必须存储在这种数据结构下，且**有序**
+2. 由于连续内存的存储结构，二分查找的数量不宜太大或者太小
+
+```c++
+// 循环实现
+int binary_search(int* a, int n, int value) {
+  int low = 0; 
+  int high = n - 1;
+  while (low <= high) {
+    // 为防止相加带来的过大数据移除，可优化为：low + (high - low) / 2
+    int mid = (low + high) / 2;
+    if (a[mid] == value) {
+      return mid;
+    } else if (a[mid] < value) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  
+  return -1;
+}
+
+// 递归实现
+int __binary_search(int* a, int low, int high, int value) {
+  if (low > high) return -1;
+  
+  int mid = low + ((high - low) >> 1);
+  if (a[mid] == value) {
+    return mid;
+  } else if (a[mid] < value) {
+    return __binary_search(a, mid+1, high, value);
+  } else {
+    return __binary_search(a, low,  mid-1, value);
+  }
+}
+
+int bsearch(int* a, int n, int val) {
+  return __binary_search(a, 0, n - 1, val);
+}
+```
+
+
+
+**二分查找适用场景**
+
+```c++
+// 求数的平方根
+double sqrt(double x, double precision) {
+	if (x < 0) return NAN;
+	
+	double low = 0;
+	double up = x;
+	if (x < 1 && x > 0) {
+		low = x;
+		up = 1;
+	}
+  
+	double mid = low + (up - low)/2.0;
+	while((up - low) > precision) {
+    // mid * mid 这里可能会溢出
+		if (mid * mid > x ) {
+			up = mid;
+		} else if (mid * mid < x) {
+			low = mid;
+		} else {
+			return mid;
+		}
+		mid = low + (up - low)/2;
+	}
+  
+	return mid;
+}
+```
 
 
 
@@ -480,3 +765,6 @@ int partition(int *arr, int p, int r)
 # 引用
 
 - [十大经典排序算法总结](https://www.cnblogs.com/guoyaohua/p/8600214.html)
+- [谈谈 STL 中的 std::sort](https://liam.page/2018/09/18/std-sort-in-STL/)
+- [谈谈内省式排序算法](https://liam.page/2018/08/29/introspective-sort/)
+- [谈谈基于比较的排序算法的复杂度下界](https://liam.page/2018/08/28/lower-bound-of-comparation-based-sort-algorithm/)
