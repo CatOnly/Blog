@@ -669,9 +669,13 @@ void radix_sort(int a[], int len, int digit_max)
 
 
 
-# 三、查找
+# 三、查找数据
 
-## 1. 二分查找
+不同的数据结构，适合不同的数据查找方式
+
+
+
+## 1. 二分查找（依赖数组）
 
 空间复杂度 $O(1)$
 
@@ -680,14 +684,15 @@ void radix_sort(int a[], int len, int digit_max)
 
 
 
-**使用二分查找的前置条件**
+### 1.1 使用二分查找的前置条件
 
-1. 二分查找依赖于数组这种连续内存的数据结构
-   查找数据必须存储在这种数据结构下，且**有序**
-2. 由于连续内存的存储结构，二分查找的数量不宜太大或者太小
+- 查找数据已经**有序**
+- 二分查找**依赖于数组**这种连续内存的数据结构
+- 由于连续内存的存储结构，二分查找的数量不宜太大或者太小
 
 ```c++
-// 循环实现
+// 1. 简单的二分查找实现（数据已经排好序，且数据不重复）
+// 1.1 循环实现
 int binary_search(int* a, int n, int value) {
   int low = 0; 
   int high = n - 1;
@@ -706,7 +711,7 @@ int binary_search(int* a, int n, int value) {
   return -1;
 }
 
-// 递归实现
+// 1.2 递归实现
 int __binary_search(int* a, int low, int high, int value) {
   if (low > high) return -1;
   
@@ -723,40 +728,248 @@ int __binary_search(int* a, int low, int high, int value) {
 int bsearch(int* a, int n, int val) {
   return __binary_search(a, 0, n - 1, val);
 }
+
+// 2. 考虑重复情况的二分查找（数据已经排好序，且数据含有多个重复的数）
+// 2.1 查找第一个值等于给定值的元素
+int bsearch(int* a, int n, int val) {
+  int low = 0;  
+  int high = n - 1;  
+  while (low <= high) {
+    int mid = low + ((high - low) >> 1);
+    if (a[mid] > val) {
+      high = mid - 1;
+    } else if (a[mid] < val) {
+      low = mid + 1;
+    } else {
+      if ((mid == 0) || (a[mid - 1] != val)) return mid;
+      else high = mid - 1;   // 由于是找可能重复数的第一个，这里不断取前半段数据
+    }
+  }
+  
+  return -1;
+}
+
+// 2.2 查找最后一个值等于给定值的元素
+int bsearch(int* a, int n, int val) {
+  int low = 0;  
+  int high = n - 1;  
+  while (low <= high) {
+    int mid = low + ((high - low) >> 1);
+    if (a[mid] > val) {
+      high = mid - 1;
+    } else if (a[mid] < val) {
+      low = mid + 1;
+    } else {
+      if ((mid == 0) || (a[mid - 1] != val)) return mid;
+      else low = mid + 1;   // 由于是找可能重复数的最后一个，这里不断取后半段数据
+    }
+  }
+  
+  return -1;
+}
+
+// 2.3 查找第一个大于等于给定值的元素
+int bsearch(int* a, int n, int val) {
+  int low = 0;  
+  int high = n - 1;  
+  while (low <= high) {
+    int mid = low + ((high - low) >> 1);
+    if (a[mid] >= val) {
+      if ((mid == 0) || (a[mid - 1] < val)) return mid;
+      else high = mid - 1;   // 由于是找可能重复数的第一个，这里不断取前半段数据
+    } else {
+      low = mid + 1;
+    }
+  }
+  
+  return -1;
+}
+
+// 2.4 查找最后一个小于等于给定值的元素
+int bsearch(int* a, int n, int val) {
+  int low = 0;  
+  int high = n - 1;  
+  while (low <= high) {
+    int mid = low + ((high - low) >> 1);
+    if (a[mid] > val) {
+      high = mid - 1;
+    } else {
+      if ((mid == n - 1) || (a[mid + 1] > val)) return mid;
+      else low = mid + 1;   // 由于是找可能重复数的最后一个，这里不断取后半段数据
+    }
+  }
+  
+  return -1;
+}
 ```
 
 
 
-**二分查找适用场景**
+### 1.2 二分查找适用场景
+
+- 二分查找更适合用在查找近似值的问题
+- 对于给定值的查找，用散列表或者二叉树比二分查找更好
 
 ```c++
-// 求数的平方根
+// 应用举例：
+// 1. 查找 IP 在某一个 IP 范围内，确定归属地（二分查找最后一个小于等于给定值的元素）
+// 2. 求数的平方根（停止二分查找的依据是一个精度范围）
 double sqrt(double x, double precision) {
 	if (x < 0) return NAN;
 	
 	double low = 0;
-	double up = x;
+	double high = x;
 	if (x < 1 && x > 0) {
 		low = x;
-		up = 1;
+		high = 1;
 	}
   
-	double mid = low + (up - low)/2.0;
-	while((up - low) > precision) {
+  double mid = low + ((up - high) >> 1);
+	while((high - low) > precision) {
     // mid * mid 这里可能会溢出
 		if (mid * mid > x ) {
-			up = mid;
+			high = mid;
 		} else if (mid * mid < x) {
 			low = mid;
 		} else {
 			return mid;
 		}
-		mid = low + (up - low)/2;
+    mid = low + ((up - high) >> 1);
 	}
   
 	return mid;
 }
 ```
+
+
+
+## 2. 跳表（依赖链表）
+
+将原来的单链表添加了额外几层**索引链表**用于更大跨度的查询数据，以提升查询速度
+
+- 空间复杂度 $O(n)$
+  索引只是整数，而查询的数据大多是浮点数比索引要多很多，这样索引占用的额外内存，反而会不那么多了
+- 时间复杂度 $O(logn) = O(C_{经过的跳表索引层数}logn)$
+- 支持快速插入、删除、查找
+  插入、删除时动态更改多层索引链表（通过随机方式在一个范围内增加新的索引节点）
+- 相比于红黑树的优势在于
+  跳表可按照区间查找数据（比如查找值在[100, 356]之间的数据）
+  跳表的代码实现比红黑树更简单，更容易维护
+
+![](./images/skipList.jpg)
+
+
+
+## 3. 散列表（依赖数组）
+
+### 3.1 结构
+
+数据结构
+
+- 内部为固定大小的表
+- 表中的每个元素表示一个或者多个 key
+
+
+
+内部实现
+
+- 通过散列函数 `int hash(key)` 根据存储的 key 值得到表的存储索引 index
+- 通过 index % 散列表的固定长度，得到存储的索引
+  如果这个索引没有被使用，则为最终的索引值
+  如果这个索引被使用了，则会产生散列冲突，通过一些方法解决散列冲突的问题后，也会得到最终的索引值
+
+![](./images/HashTable.jpg)
+
+
+
+### 3.2 散列函数
+
+```c++
+// 散列函数的设计并不复杂，追求的是简单高效、分布均匀
+int hash(Object key) {    
+  int h = key.hashCode()；
+  // 除留余数法 A % B = A & (B - 1)
+  return (h ^ (h >>> 16)) & (capicity -1); //capicity表示散列表的大小
+}
+```
+
+#### 3.2.1 哈希算法
+
+
+
+
+
+### 3.3 防止散列冲突
+
+在有限大小的散列表里通过**散列函数**使 key 和 index 一一对应十分困难，即便像业界著名的 MD5、SHA、CRC 等哈希算法也无法避免散列冲突
+
+**面对散列冲突，优先给原来的散列数组做动态扩容，其次在使用防止散列冲突的方法**
+
+
+
+#### 3.3.1 开放寻址法
+
+不会开辟新的内存，在原散列表里重新探测一个空闲位置，将其插入
+
+当散列表中空闲位置不多的时候，散列冲突的概率就会大大提高
+一般通过装载因子来衡量散列表中空位的多少 `散列表的装载因子 = 填入表中的元素个数 / 散列表的长度`
+
+
+
+探测方法
+
+1. **线性探测（Linear Probing）**常用方法
+   $hash(key)+i$ 从冲突的索引开始，依次往后查找下一个，看是否有空闲位置，直到找到为止
+2. 二次探测（Quadratic probing）
+   $hash(key)+i^2$ 从冲突的索引开始，依次往后查找，步长为线性探测原步长的平方
+3. 双重散列（Double hashing）
+   先用第一个散列函数，如果计算得到的存储位置已经被占用，再用第二个散列函数，依次类推，直到找到空闲的存储位置
+
+
+
+下图为使用线性探测的散列表的查找操作
+
+- 插入时，如果发生散列冲突，就探测下一个位置，直到找到空位为止
+- 删除时，为了让有冲突的散列数据**保持连续**，需要**通过打上删除的标记，而不是设为空**
+- 查找时，如果找到先比较找到的 key 是否与当前 key 相同
+  如果不相同，则此 key 发生了散列冲突，就探测下一个位置，直到找到与当前 key 相同的值 或 空位为止
+
+![](./images/HashTableLinear.jpg)
+
+
+
+#### 3.3.2 链表法
+
+需要开辟新的内存，所有散列值相同的元素我们都放到相同槽位对应的链表中
+有时候为了效率，散列数组内的链表可能会被红黑树等树形结构代替（例：Java HashMap）
+
+![](./images/HashTableLink.png)
+
+
+
+### 3.4 散列表 + 链表 / 跳表
+
+用散列表和双向链表来指向同一个数据，这样的数据结构（例：Java LinkHashMap 按访问时间排序）
+
+- 即有散列表的快速查找效果
+- 又有双向链表的快速插入和删除效果
+
+
+
+下图中，hnext 服务于散列表，为了将节点串在散列表的拉链中
+
+![](./images/HashTableLinkList.jpg)
+
+
+
+**应用场景：缓存淘汰策略 LRU**
+
+缓存的大小有限，当缓存被用满时，哪些数据应该被清理出去，哪些数据应该被保留？这就需要缓存淘汰策略来决定，常见的策略有三种：
+
+- 先进先出策略 FIFO（First In，First Out）
+- 最少使用策略 LFU（Least Frequently Used）
+- 最近最少使用策略 LRU（Least Recently Used）
+  同样也是先进先出的操作，不过会在访问数据时，将被访问的数据重新排在后面，做到最近最少使用的最先出
 
 
 

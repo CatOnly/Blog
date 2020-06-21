@@ -1,6 +1,246 @@
 [TOC]
 
-# 一、STL 容器
+# 一、序列式存储结构
+
+| 时间复杂度 | 数组 | 链表 |
+| ---------- | ---- | ---- |
+| 插入、删除 | O(n) | O(1) |
+| 随机访问   | O(1) | O(n) |
+
+## 1. 链表
+
+链表结构
+
+其中，带头链表利用了添加哨兵来简化操作的思想
+
+![](./images/LinkList.png)
+
+
+
+链表实现
+
+```c++
+// 双向链表节点
+typedef struct DNode {
+    int data;           //数据，当作为表头时存储整个链表的长度
+    struct DNode *prev; //节点前项指针
+    struct DNode *next; //节点后项指针
+} DNode, *DLinkList;
+
+// 双向循环带头链表 Double Circular Link List
+void DCLinkListCreate(DLinkList& plist)
+{
+    plist = (DLinkList)malloc(sizeof(DNode));
+    if (plist)
+        plist->next = plist->prev = plist;
+    else
+        exit(OVERFLOW);
+}
+
+// 彻底删除链表，包括头节点
+void DCLinkListDestroy(DLinkList& plist)
+{
+    DCLinkListClear(plist);
+    free(plist);
+
+    plist = nullptr;
+}
+
+// 从前往后删除节点，只保留头节点
+void DCLinkListClear(DLinkList& plist)
+{
+    DLinkList pFirst = plist->next;
+    DLinkList pSecond;
+    while (pFirst != plist) {
+        pSecond = pFirst->next;
+        free(pFirst);
+        pFirst = pSecond;
+    }
+
+    // 回到初始状态
+    plist->next = plist->prev = plist;
+}
+
+DNode* DCLinkListSearch(DLinkList& plist, size_t index)
+{
+    if (index >= (size_t)plist->data) return nullptr;
+
+    DNode *pNode = plist->next;
+    for (size_t i = 0; i < index; ++i) {
+        pNode = pNode->next;
+    }
+
+    return pNode;
+}
+
+void DCLinkListInsertTail(DLinkList& plist, int data)
+{
+     DNode* pNode = (DNode *)malloc(sizeof(DNode));
+     pNode->data = data;
+
+     pNode->prev = plist->prev;
+     pNode->next = plist;
+
+     plist->prev->next = pNode;
+     plist->prev = pNode;
+
+     ++(plist->data);
+}
+
+void DCLinkListRemove(DLinkList& plist, int index)
+{
+    if(plist->data == 0) return;
+
+    DNode* pNode = DCLinkListSearch(plist, index);
+    if (nullptr == pNode) return;
+
+    pNode->prev->next = pNode->next;
+    pNode->next->prev = pNode->prev;
+    free(pNode);
+
+    --(plist->data);
+}
+
+void TestCode()
+{
+    DLinkList list;
+    DCLinkListCreate(list);
+
+    DCLinkListInsertTail(list, 3);
+    DCLinkListInsertTail(list, 2);
+    DCLinkListInsertTail(list, 5);
+    DCLinkListInsertTail(list, 0);
+    DCLinkListInsertTail(list, 9);
+
+    DCLinkListRemove(list, 3);
+
+    for (int i = 0; i < list->data; ++i) {
+        DNode* node = DCLinkListSearch(list, i);
+        printf("%d", node->data);
+    }
+    printf("\n");
+
+    DCLinkListDestroy(list);
+}
+```
+
+
+
+## 2. 栈
+
+栈结构
+
+![](./images/Stack.jpg)
+
+栈实现
+
+```c++
+// 基于数组实现的顺序栈
+template <typename T>
+class StackArray {
+private:
+  T* m_items;  		// 数组
+	int m_count;    // 栈中元素个数
+	int m_capacity; // 栈的大小
+
+public:
+  StackArray(int n) {
+		m_items = new T[n];
+    m_count = 0;
+		m_capacity = n;
+  }
+
+  // 入栈操作
+  bool push(T item) {
+    if (m_count == m_capacity) return false;
+    
+    // 将 item 放到下标为 count 的位置，并且 count 加一
+    m_items[m_count++] = item;
+    
+    return true;
+  }
+  
+  // 出栈操作
+  T pop() {
+    if (m_count == 0) return NULL;
+    
+		T tmp = m_items[m_count - 1];
+    --m_count;
+    
+    return tmp;
+  }
+  
+  int count() {
+      return m_count;
+  }
+
+  T search(size_t index) {
+    if (index >= (size_t)m_count) return NULL;
+
+    return m_items[index];
+  }
+};
+
+void TestCode() {
+  StackArray<int> stack(10);
+  
+  stack.push(3);
+  stack.push(0);
+  stack.push(5);
+  stack.push(2);
+  stack.push(9);
+  stack.pop();
+
+  for (int i = 0; i < stack.count(); ++i) {
+  	printf("%d ", stack.search(i));
+  }
+  printf("\n");
+}
+```
+
+
+
+## 3. 队列
+
+队列结构
+
+![](./images/Queue.png)
+
+
+
+队列实现
+
+```c++
+
+```
+
+
+
+
+
+# 二、二叉树 Binary Tree
+
+## 1. 树
+
+## 2. 二叉树
+
+## 3. 红黑树
+
+## 4. 递归树
+
+## 5. 堆
+
+
+
+
+
+# 三、图 Graph
+
+
+
+
+
+# 四、STL 容器
 
 ## 1. 序列式容器
 
@@ -68,7 +308,7 @@ std::deque<float> vector4f(4);
 ### 2.1 集合 Set
 
 - 内部由红黑树实现
-- 其内部元素依据其值自动排序
+- 其内部元素依据其值**自动排序**
 - Set 集合每个元素值只能出现一次，不允许重复
   **Multiset 集合允许重复元素**
 - 当 Set 集合中的元素为结构体时，该结构体必须实现运算符 `<` 的重载
@@ -113,13 +353,16 @@ int main(int argc, char* argv[]) {
 ### 2.2 映射 Map
 
 - 内部由红黑树实现
-- 其元素都是 key/value 所形成的一个 pairs，依据 key 值自动排序
+- 其元素都是 key/value 所形成的一个 pairs，依据 key 值**自动排序**
 - Map 每一个 key 只能出现一次，不允许重复
   **Multimap 允许重复多个 key**
 - 对于迭代器来说，可以修改实值，而不能修改 key
 
 ```c++
 std::map<string, int> mapTemp;
+
+// 由散列表实现的 hash_map, 在其他语言里多为字典类型的容器由散列表实现
+std::hash_map<string, int> hashMapTemp;
 ```
 
 
@@ -179,103 +422,6 @@ class priority_queue{
 
 std::priority_queue<int> my_priority_queue;
 ```
-
-
-
-# 二、散列 Hashing
-
-## 1. 散列表 Hash Table
-
-数据结构
-
-- 内部为固定大小的表
-- 表中的每个元素表示一个或者多个 key
-
-
-
-内部实现
-
-- 通过散列函数 `int hash(key)` 根据存储的 key 值得到表的存储索引 index
-- 通过 index % 散列表的固定长度，得到存储的索引
-  如果这个索引没有被使用，则为最终的索引值
-  如果这个索引被使用了，则会产生散列冲突，通过一些方法解决散列冲突的问题后，也会得到最终的索引值
-
-![](./images/HashTable.jpg)
-
-
-
-## 2. 哈希算法
-
-
-
-
-
-## 3. 防止散列冲突
-
-在有限大小的散列表里通过**散列函数**使 key 和 index 一一对应十分困难，即便像业界著名的 MD5、SHA、CRC 等哈希算法也无法避免散列冲突
-
-### 3.1 开放寻址法
-
-不会开辟新的内存，在原散列表里重新探测一个空闲位置，将其插入
-
-当散列表中空闲位置不多的时候，散列冲突的概率就会大大提高
-一般通过装载因子来衡量散列表中空位的多少 `散列表的装载因子 = 填入表中的元素个数 / 散列表的长度`
-
-
-
-探测方法
-
-1. **线性探测（Linear Probing）**常用方法
-   $hash(key)+i$ 从冲突的索引开始，依次往后查找下一个，看是否有空闲位置，直到找到为止
-2. 二次探测（Quadratic probing）
-   $hash(key)+i^2$ 从冲突的索引开始，依次往后查找，步长为线性探测原步长的平方
-3. 双重散列（Double hashing）
-   先用第一个散列函数，如果计算得到的存储位置已经被占用，再用第二个散列函数，依次类推，直到找到空闲的存储位置
-
-
-
-下图为使用线性探测的散列表的查找操作
-
-- 插入时，如果发生散列冲突，就探测下一个位置，直到找到空位为止
-- 删除时，为了让有冲突的散列数据**保持连续**，需要**通过打上删除的标记，而不是设为空**
-- 查找时，如果找到先比较找到的 key 是否与当前 key 相同
-  如果不相同，则此 key 发生了散列冲突，就探测下一个位置，直到找到与当前 key 相同的值 或 空位为止
-
-![](./images/HashTableLinear.jpg)
-
-
-
-### 3.2 链表法
-
-需要开辟新的内存，所有散列值相同的元素我们都放到相同槽位对应的链表中
-
-![](./images/HashTableLink.jpg)
-
-
-
-
-
-# 三、二叉树 Binary Tree
-
-## 1. 树
-
-## 2. 二叉树
-
-## 3. 红黑树
-
-## 4. 递归树
-
-## 5. 堆
-
-
-
-
-
-# 四、图 Graph
-
-
-
-
 
 
 
