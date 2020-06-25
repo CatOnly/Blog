@@ -144,6 +144,7 @@ private:
 	int m_capacity; // 栈的大小
 
 public:
+  StackArray() = delete;
   StackArray(int n) {
 		m_items = new T[n];
     m_count = 0;
@@ -211,30 +212,834 @@ void TestCode() {
 队列实现
 
 ```c++
+// 1. 队列链表实现
+template <typename T>
+class QueueLinked {
 
+private:
+    typedef struct Node {
+        T data;
+        Node* next;
+
+        Node(T item):data(item),next(nullptr){}
+    } Node;
+
+    Node* m_pHead = nullptr;
+    Node* m_pTail = nullptr;
+
+public:
+    void enqueue(T item) {
+        Node* pNode = new Node(item);
+        if (nullptr == m_pHead) {
+            m_pHead = pNode;
+            m_pTail = m_pHead;
+        } else {
+            m_pTail->next = pNode;
+            m_pTail = m_pTail->next;
+        }
+    }
+
+    void dequeue() {
+        if (nullptr != m_pHead) {
+            Node* pNode = m_pHead;
+            m_pHead = pNode->next;
+            free(pNode);
+            if (nullptr == m_pHead) {
+                m_pTail = nullptr;
+            }
+
+        } else {
+            throw "dequeue: empty!";
+        }
+    }
+
+    template <typename FUNC>
+    void traverse(FUNC callback) {
+       for (Node* pNode = m_pHead; nullptr != pNode; pNode = pNode->next) {
+           callback(pNode->data);
+       }
+    }
+};
+
+// 2. 循环队列
+template <typename T>
+class QueueCircular {
+
+private:
+    T*     m_items    = nullptr;
+    size_t m_capacity = 0;
+    size_t m_head     = 0;
+    size_t m_tail     = 0;
+
+public:
+    QueueCircular() = delete;
+    QueueCircular(const size_t capacity) {
+        m_items = new T[capacity];
+        m_capacity = capacity;
+    }
+    ~QueueCircular() {
+        if (nullptr != m_items) {
+            delete[] m_items;
+            m_items = nullptr;
+        }
+    }
+
+  public:
+    void enqueue(T item) {
+        if ((m_tail + 1) % m_capacity == m_head) {
+            throw "QueueCircular::enqueue queue is Full!";
+        }
+        m_items[m_tail] = item;
+        m_tail = (m_tail + 1) % m_capacity;
+    }
+
+    void dequeue() {
+        // 随着队列的使用，队列为空时 m_head 和 m_tail 一定会相等，但他们不一定都为 0
+        if (m_head != m_tail) {
+            m_head = (m_head + 1) % m_capacity;
+        } else {
+            throw "QueueCircular::dequeue queue is Empty!";
+        }
+    }
+
+  public:
+    template <typename FUNC>
+    void traverse(FUNC callback) {
+        for (size_t i = m_head; i % m_capacity != m_tail; ++i) {
+            callback(m_items[i % m_capacity]);
+        }
+    }
+};
+
+void TestCode() {
+//    QueueCircular<int> queue(20);
+  	QueueLinked<int> queue;
+  
+    queue.enqueue(1);
+    queue.enqueue(2);
+    queue.enqueue(3);
+    queue.dequeue();
+
+    queue.traverse([&](int item) {
+        std::cout << item << " ";
+    });
+    std::cout <<  std::endl;
+
+    queue.enqueue(4);
+    queue.enqueue(5);
+
+    queue.traverse([&](int item) {
+        std::cout << item << " ";
+    });
+    std::cout <<  std::endl;
+
+    queue.dequeue();
+    queue.dequeue();
+    queue.dequeue();
+    queue.dequeue();
+    queue.enqueue(9);
+    queue.enqueue(6);
+
+    queue.traverse([&](int item) {
+        std::cout << item << " ";
+    });
+    std::cout <<  std::endl;
+}
+```
+
+
+
+队列的应用
+
+- 阻塞队列
+  队列为空，取数据的操作会阻塞，直到队列中有数据新加入后，取数据操作才放开阻塞并返回数据
+  队列为满，添加队列的操作会阻塞，直到队列中有空闲位置，添加队列操作才会放开阻塞并返回
+  
+- 并发队列
+
+  ```c++
+  #include <queue>
+  #include <mutex>
+  #include <condition_variable>
+  #include <memory>
+  
+  template <typename T>
+  class ConcurrencyQueue {
+    private:
+      std::queue<T> m_queue;
+      mutable std::mutex m_mutex;
+      std::condition_variable m_condition_var;
+  
+    public:
+      bool empty() const {
+          std::lock_guard<std::mutex> lg(m_mutex);
+          return m_queue.empty();
+      }
+      void push(T item) {
+          std::lock_guard<std::mutex> lg(m_mutex);
+          m_queue.push(item);
+          m_condition_var.notify_one();
+      }
+      std::shared_ptr<T> wait_and_pop() {
+          std::unique_lock<std::mutex> lk(m_mutex);
+          while (m_queue.empty()) {
+              m_condition_var.wait(lk);
+          }
+          auto res = m_queue.front();
+          m_queue.pop();
+  
+          return res;
+      }
+      std::shared_ptr<T> try_pop() {
+          std::lock_guard<std::mutex> lg(m_mutex);
+          if (m_queue.empty()) return nullptr;
+  
+          auto res = m_queue.front();
+          m_queue.pop();
+  
+          return res;
+      }
+  };
+  ```
+
+  
+
+## 4. 跳表（依赖链表）
+
+将原来的单链表添加了额外几层**索引链表**用于更大跨度的查询数据，以提升查询速度
+
+- 空间复杂度 $O(n)$
+  索引只是整数，而查询的数据大多是浮点数比索引要多很多，这样索引占用的额外内存，反而会不那么多了
+- 时间复杂度 $O(logn) = O(C_{经过的跳表索引层数}logn)$
+- 支持快速插入、删除、查找
+  插入、删除时动态更改多层索引链表（通过随机方式在一个范围内增加新的索引节点）
+- 相比于红黑树的优势在于
+  跳表可按照区间查找数据（比如查找值在[100, 356]之间的数据）
+  跳表的代码实现比红黑树更简单，更容易维护
+
+![](./images/skipList.jpg)
+
+
+
+## 5. 散列表（依赖数组）
+
+### 5.1 结构
+
+数据结构
+
+- 内部为固定大小的表
+- 表中的每个元素表示一个或者多个 key
+
+
+
+内部实现
+
+- 通过散列函数 `int hash(key)` 根据存储的 key 值得到表的存储索引 index
+- 通过 index % 散列表的固定长度，得到存储的索引
+  如果这个索引没有被使用，则为最终的索引值
+  如果这个索引被使用了，则会产生散列冲突，通过一些方法解决散列冲突的问题后，也会得到最终的索引值
+
+![](./images/HashTable.jpg)
+
+
+
+### 5.2 散列函数
+
+```c++
+// 散列函数的设计并不复杂，追求的是简单高效、分布均匀
+int hash(Object key) {    
+  int h = key.hashCode()；
+  // 除留余数法 A % B = A & (B - 1)
+  return (h ^ (h >>> 16)) & (capicity -1); //capicity表示散列表的大小
+}
+```
+
+#### 5.2.1 哈希算法
+
+哈希算法：将任意长度的二进制值串映射为固定长度的二进制值串，通过原始数据映射之后得到的二进制值串就是**哈希值**
+
+特点：
+
+- 最后得到的哈希值长度一固定
+- 从哈希值不能反向推导出原始数据
+- 对输入数据非常敏感，哪怕原始数据只修改了一个 Bit，最后得到的哈希值也大不相同
+- 散列冲突的概率很小
+- 执行效率高，针对较长的文本，也能快速地计算出哈希值
+
+
+
+应用：
+
+1. 安全加密
+   需要权衡破解难度和计算时间，来决定究竟使用哪种加密算法，常用的加密算法有
+   MD5（MD5 Message-Digest Algorithm，MD5 消息摘要算法）
+   SHA（Secure Hash Algorithm，安全散列算法）
+   DES（Data Encryption Standard，数据加密标准）
+   AES（Advanced Encryption Standard，高级加密标准）
+2. 唯一标识
+   例：比较图片是否相同时，需要每一个图片取一个唯一标识，或者说信息摘要，通过这个唯一标识来判定图片是否在图库中，这样就可以减少很多工作量
+   比如，我们可以从图片的二进制码串开头取 100 个字节，从中间取 100 个字节，从最后再取 100 个字节，然后将这 300 个字节放到一块，通过哈希算法（比如 MD5），得到一个哈希字符串，用它作为图片的唯一标识
+3. 数据校验
+   BT 下载时会对下载好的文件块逐一求哈希值，然后跟种子文件中保存的哈希值比对。如果不同，说明这个文件块不完整或者被篡改了，需要再重新从其他宿主机器上下载这个文件块
+4. 散列函数
+   散列函数用的散列算法一般都<u>比较简单，比较追求效率</u>
+
+
+
+### 5.3 防止散列冲突
+
+在有限大小的散列表里通过**散列函数**使 key 和 index 一一对应十分困难，即便像业界著名的 MD5、SHA、CRC 等哈希算法也无法避免散列冲突
+
+**面对散列冲突，优先给原来的散列数组做动态扩容，其次在使用防止散列冲突的方法**
+
+
+
+#### 5.3.1 开放寻址法
+
+不会开辟新的内存，在原散列表里重新探测一个空闲位置，将其插入
+
+当散列表中空闲位置不多的时候，散列冲突的概率就会大大提高
+一般通过装载因子来衡量散列表中空位的多少 `散列表的装载因子 = 填入表中的元素个数 / 散列表的长度`
+
+
+
+探测方法
+
+1. **线性探测（Linear Probing）**常用方法
+   $hash(key)+i$ 从冲突的索引开始，依次往后查找下一个，看是否有空闲位置，直到找到为止
+2. 二次探测（Quadratic probing）
+   $hash(key)+i^2$ 从冲突的索引开始，依次往后查找，步长为线性探测原步长的平方
+3. 双重散列（Double hashing）
+   先用第一个散列函数，如果计算得到的存储位置已经被占用，再用第二个散列函数，依次类推，直到找到空闲的存储位置
+
+
+
+下图为使用线性探测的散列表的查找操作
+
+- 插入时，如果发生散列冲突，就探测下一个位置，直到找到空位为止
+- 删除时，为了让有冲突的散列数据**保持连续**，需要**通过打上删除的标记，而不是设为空**
+- 查找时，如果找到先比较找到的 key 是否与当前 key 相同
+  如果不相同，则此 key 发生了散列冲突，就探测下一个位置，直到找到与当前 key 相同的值 或 空位为止
+
+![](./images/HashTableLinear.jpg)
+
+
+
+#### 5.3.2 链表法
+
+需要开辟新的内存，所有散列值相同的元素我们都放到相同槽位对应的链表中
+有时候为了效率，散列数组内的链表可能会被红黑树等树形结构代替（例：Java HashMap）
+
+![](./images/HashTableLink.png)
+
+
+
+### 5.4 散列表 + 链表 / 跳表
+
+用散列表和双向链表来指向同一个数据，这样的数据结构（例：Java LinkHashMap 按访问时间排序）
+
+- 即有散列表的快速查找效果
+- 又有双向链表的快速插入和删除效果
+
+
+
+下图中，hnext 服务于散列表，为了将节点串在散列表的拉链中
+
+![](./images/HashTableLinkList.jpg)
+
+
+
+**应用场景：缓存淘汰策略 LRU**
+
+缓存的大小有限，当缓存被用满时，哪些数据应该被清理出去，哪些数据应该被保留？这就需要缓存淘汰策略来决定，常见的策略有三种：
+
+- 先进先出策略 FIFO（First In，First Out）
+- 最少使用策略 LFU（Least Frequently Used）
+- 最近最少使用策略 LRU（Least Recently Used）
+  同样也是先进先出的操作，不过会在访问数据时，将被访问的数据重新排在后面，做到最近最少使用的最先出
+
+
+
+# 二、树形存储结构
+
+![](./images/Tree.jpg)
+
+**节点的高度（Height）**从下往上度量
+节点到叶子节点的最长路径（边数），树的高度就是根节点的高度
+
+**深度（Depth）**从上往下度量
+根节点到这个节点所经历的边的个数
+
+**层（Level）**从上往下度量
+节点的深度 + 1
+
+
+
+## 1. 二叉树 Binary Tree
+
+二叉树：每个节点最多有两个子节点
+
+满二叉树：除了叶子节点之外，每个节点都有左右两个子节点
+
+完全二叉树：叶子节点都在<u>最底下两层</u>，最后一层的<u>叶子节点都靠左排列</u>，并且<u>除了最后一层，其他层的节点个数都要达到最大</u>
+
+![](./images/TreeBinary.jpg)
+
+### 1.1 存储二叉树
+
+**链式存储**
+
+- 常用的存储方式简单、直观
+
+![](./images/TreeBinaryLink.jpg)
+
+
+
+**顺序存储**
+
+- 最节省内存的存储方式
+  数组的存储方式并不需要像链式存储法那样，要存储额外的左右子节点的指针
+- 根节点存储在下标 i = 1 的位置
+- 左子节点存储在下标 2 * i 的位置
+- 右子节点存储在下标 2 * i + 1 的位置
+- 父亲节点存储在下表 i / 2 的位置（整数相除，会丢弃小数位）
+
+
+
+完全二叉树，用数组存储最节省内存，如下图
+
+![](./images/TreeBinaryArray.png)
+
+
+
+### 1.2 遍历二叉树
+
+![](./images/TreeBinaryPass.jpg)
+
+遍历的时间复杂度 $O(n)$
+
+```c++
+typedef struct BTNode
+{
+	int data;
+	struct BTNode* left;
+	struct BTNode* right;
+} BTNode, Tree;
+
+// 先序遍历
+// 1. 先遍历这个节点
+// 2. 再遍历它的左子树
+// 3. 最后遍历它的右子树
+void preOrder(BTNode* root) {
+  if (root == nullptr) return;
+  
+  printf("%d ", root->data);
+  preOrder(root->left);
+  preOrder(root->right);
+}
+
+// 中序遍历
+// 1. 先遍历它的左子树
+// 2. 再遍历这个节点
+// 3. 最后遍历它的右子树
+void inOrder(BTNode* root) {
+  if (root == nullptr) return;
+  
+  inOrder(root->left);
+  printf("%d ", root->data);
+  inOrder(root->right);
+}
+
+// 后序遍历
+// 1. 先遍历它的左子树
+// 2. 再遍历它的右子树
+// 3. 最后遍历这个节点
+void postOrder(BTNode* root) {
+  if (root == nullptr) return;
+  
+  postOrder(root->left);
+  postOrder(root->right);
+  printf("%d ", root->data);
+}
+void postOrder2(BTNode* root) {
+  std::stack<BTNode*> stackNode;
+  std::stack<BTNode*> stackTmp;
+  stackTmp.push(root);
+  
+  while (!stackTmp.empty()) {
+    BTNode* node = stackTmp.top();
+    stackTmp.pop();
+    stackNode.push(node);
+    
+    if (nullptr != node->left) {
+        stackTmp.push(node->left);
+    }
+    if (nullptr != node->right) {
+        stackTmp.push(node->right);
+    }
+  }
+  while (!stackNode.empty()) {
+    BTNode* node = stackNode.top();
+    stackNode.pop();
+    printf("%d ", node->data);
+  }
+}
+
+// 层级遍历（广度优先遍历）
+void levelOrder(BTNode* root) {
+  if (root == nullptr) return;
+  
+  std::queue<BTNode*> queue;
+  queue.push(root);
+  
+	while(!queue.empty()) {
+    BTNode* pNode = queue.front();
+		printf("%d ", pNode->data);
+    queue.pop();
+
+		if(pNode->left != nullptr) {
+      queue.push(pNode->left);
+		}
+		if(pNode->right != nullptr) {
+      queue.push(pNode->right);
+		}
+	} // while
+}
+
+// 获取树的高度
+int treeHeight(BTNode *root) {
+	int lheight = 0;
+	int rheight = 0;
+	
+	if (nullptr == root) return 0;
+
+	lheight = treeHeight(root->left);
+	rheight = treeHeight(root->right);
+
+	return std::max(lheight, rheight) + 1;
+}
+
+// TestCode 
+void addNodeByArray(BTNode* root, int* array, int idx) {
+  BTNode *left = new BTNode();
+	left->data = array[idx * 2];
+	BTNode *right = new BTNode();
+	right->data = array[idx * 2 + 1];
+
+	root->data = array[idx];
+	root->left = left;
+	root->right = right;
+}
+
+//    1
+//  2   3
+// 4 5 6 7
+BTNode* createBTree(){
+	int numbers[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+	BTNode *root = new BTNode();
+	addNodeByArray(root, numbers, 1);
+	addNodeByArray(root->left, numbers, 2);
+	addNodeByArray(root->right, numbers, 3);
+
+	return root;
+}
+
+void destroyBTree(BTNode *root) {
+	if (root == nullptr) return;
+
+	destroyBTree(root->left);
+	destroyBTree(root->right);
+	free(root);
+}
+
+void TestCode(){
+  BTNode* root = createBTree();
+  printf("树高：%d\n", treeHeight(root));
+  preOrder(root);
+	printf("\n");
+  inOrder(root);
+  printf("\n");
+  postOrder(root);
+  printf("\n");
+  postOrder2(root);
+  printf("\n");
+  levelOrder(root);
+  printf("\n");
+  
+  destroyBTree(root);
+}
+```
+
+
+
+### 1.3 堆 Heap
+
+堆
+
+- **是完全二叉树**
+  完全二叉树适合用数组来存储，因此堆也适合用数组来存储
+- 堆中每一个节点的值都必须
+  大于等于（大顶堆）或小于等于（小顶堆）其子树中**每个节点**的值
+
+
+
+同一组数据，我们可以构建多种不同形态的堆
+
+![](./images/Heap.jpg)
+
+**查找**
+
+堆的查找是二分查找，查找速度取决于堆的高度 $O(logh)$，因此堆的查找速度相对较快
+
+
+
+**插入**
+
+得益于堆的数组存储结构，我们可以很快的将插入节点放到堆最后面
+
+![](./images/HeapInsert.png)
+
+```c++
+template <typename T>
+class Heap {
+private:
+  T* a; 		 // 数组，从下标 1 开始存储数据
+	int n;  	 // 堆可以存储的最大数据个数
+	int count; // 堆中已经存储的数据个数
+
+public:
+  Heap(int capacity) {
+    a = new int[capacity + 1];
+    n = capacity;
+    count = 0;
+  }
+
+  void insert(int data) {
+    if (count >= n) return;
+    ++count;
+    a[count] = data;
+    int i = count;
+    while (i/2 > 0 && a[i] > a[i/2]) { // 自下往上堆化
+      std::swap(a[i], a[i/2]); 				 // 交换 i 和 i 的父节点
+      i = i/2;
+    }
+  }
+ };
+```
+
+
+
+**删除**
+
+单纯删除要删除的节点会造成删除后的堆很可能不符合完全二叉树的标准，同样得益于堆数组的存储形式，可以将要删除的节点**换到最后一个节点**，然后删除最后一个节点，最后做和添加一样的**堆化**操作
+
+![](./images/HeapRemove.png)
+
+```c++
+public:
+  ...
+    
+  void removeMax() {
+    if (count == 0) return;
+    a[1] = a[count];
+    --count;
+    heapify(a, count, 1);
+  }
+
+  // 堆化：自上往下
+  void heapify(T* a, int n, int i) { 
+    while (true) {
+      int maxPos = i;
+      if (i*2 <= n && a[i] < a[i*2]) 					maxPos = i*2;
+      if (i*2+1 <= n && a[maxPos] < a[i*2+1]) maxPos = i*2+1;
+      if (maxPos == i) 												break;
+      std::swap(a[i], a[maxPos]);
+      i = maxPos;
+    }
+  }
+};
 ```
 
 
 
 
 
-# 二、二叉树 Binary Tree
 
-## 1. 树
+## 2. 二叉查找树 Binary Search Tree
 
-## 2. 二叉树
+二叉查找树，树中任意一个节点
 
-## 3. 红黑树
+- 其左子树每个节点的值，都小于这个节点的值
+- 其右子树每个节点的值，都大于这个节点的值
+- 中序遍历二叉查找树，可以输出有序的数据序列（无需额外的排序操作，这一点比散列表有优势）
+- 不管操作是插入、删除还是查找，时间复杂度其实都跟树的高度成正比  $O(height)$
+极端情况下会退化为链表
+  ![](./images/TreeBinarySearch.jpg)
 
-## 4. 递归树
 
-## 5. 堆
+
+重复数据在二叉查找树中的存储
+
+1. 相同的数据都存储在同一个节点
+   把每个节点的结构变为链表或者数组
+
+2. 添加时，重复的数据当作大于这个节点的值来处理
+   删除时，继续向右子树查找是否还有重复的树，有就继续删除
+   查找时，找到后仍会继续在右子树中查找，直到遇到叶子节点，以便查找出所有的节点
+
+   ![](./images/TreeBinarySearchRepeat.jpg)
+
+
+
+### 2.1 BSTree 的查找和添加
+
+```c++
+typedef struct BTNode
+{
+	int data;
+	struct BTNode* left;
+	struct BTNode* right;
+  BTNode(int _data):data(_data),left(nullptr),right(nullptr){}
+} BTNode, Tree;
+
+BTNode* BSTreeFind(BTNode* root, int data) {
+  BTNode* node = root;
+  while (nullptr != node) { 
+    if (data < node->data)
+      node = node->left; 
+    else if (data > node->data)
+      node = node->right;
+    else
+      return node;
+  }
+  
+  return nullptr;
+}
+
+void BSTreeInsert(BTNode* root, int data) {
+  if (nullptr == root) {
+    root = new BTNode(data);
+    return;
+  }
+
+  BTNode* node = root;
+  while (nullptr != node) {
+    if (data > node->data) {
+      if (nullptr == node->right) {
+        node->right = new BTNode(data);
+        return;
+      }
+      node = node->right;
+    } else { // data < node->data
+      if (nullptr == node->left) {
+        node->left = new BTNode(data);
+        return;
+      }
+      node = node->left;
+    }
+  } // while
+}
+```
+
+
+
+### 2.2 BSTree 的删除
+
+还可以将要删除的节点标记为 "已删除"，但是并不真正从树中将这个节点去掉，这样不会增加插入和查找的复杂度，但比较浪费空间
+
+```c++
+void BSTreeDelete(BTNode* root, int data) {
+  BTNode* node = root; 
+  BTNode* nodeSuper = nullptr; 
+  while (nullptr != node && node->data != data) {
+    nodeSuper = node;
+    node = data > node->data ? node->right : node->left;
+  }
+  
+  if (nullptr == node) return; // 没有找到要删除的数据
+
+  // 要删除的节点有两个子节点，调整树结构
+  if (nullptr != node->left && nullptr != node->right) { // 查找右子树中最小节点
+    BTNode* minNode = node->right;
+    BTNode* minNodeSuper = node;
+    while (nullptr != minNode->left) {
+      minNodeSuper = minNode;
+      minNode = minNode->left;
+    }
+    
+    node->data = minNode->data;  // 将适合的叶子节点和要删除的节点交换数据
+    node = minNode;							 // 最后只删除叶子节点，简化了操作
+    nodeSuper = minNodeSuper;
+  }
+
+  // 删除节点是叶子节点或者仅有一个子节点
+  BTNode* nodeChild;
+  if (node->left  != nullptr) 
+    nodeChild = node->left;
+  else if (node->right != nullptr) 
+    nodeChild = node->right;
+  else 														 
+    nodeChild = nullptr;
+
+  if (nodeSuper == nullptr) 
+    root = nodeChild;
+  else if (nodeSuper->left == node)
+    nodeSuper->left = nodeChild;
+  else 
+    nodeSuper->right = nodeChild;
+  
+  delete node;
+}
+```
+
+
+
+### 2.3 平衡二叉树查找树
+
+![](./images/TreeBinarySearchAVL.jpg)
+
+平衡：解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题
+平衡二叉树：二叉树中**任意一个**节点的左右子树的高度相差不能大于 1
+平衡二叉查找树：平衡二叉树的特点 + 二叉查找树的特点
+
+AVL 树：是平衡二叉查找树的一种，每次插入、删除都要做调整，就比较复杂、耗时
+
+由于平衡二叉查找树的实现复杂，应用不如红黑树广泛，这里不过多赘述
+
+
+
+### 2.4 红黑树 Red-Black Tree
+
+> 学习数据结构和算法，要学习它的由来、特性、适用的场景以及它能解决的问题
+> 红黑树的学习重点应该放在红黑树的应用而不是实现上
+
+红黑树：一种近似平衡的**平衡二叉查找树**，高度稳定地趋近 $log_2n$
+从根节点到各个叶子节点的最长路径，有可能会比最短路径大一倍
+
+- 根节点是黑色的
+- 每个叶子节点都是黑色的空节点
+  叶子节点不存储数据，作为哨兵简化代码实现用
+- 任何相邻的节点都不能同时为红色
+  红色节点是被黑色节点隔开的
+- 每个节点，从该节点到达其可达叶子节点的所有路径，都包含**相同数目的黑色节点**
+
+
+
+红黑树去掉红色节点后，是一个类似于完全二叉树（从四叉树中取出某些节点，放到叶节点位置，四叉树就变成了完全二叉树，因此相同节点数目下，四叉树的高度 低于 完全二叉树）
+
+红黑树加上去掉的红色节点后，由于红黑树相邻节点不能同时为红色，树高大约增加为原来的两倍
+
+![](./images/TreeRedBlack.jpg)
+
 
 
 
 
 
 # 三、图 Graph
+
+
 
 
 
@@ -433,4 +1238,7 @@ std::priority_queue<int> my_priority_queue;
 - [What You Should Know about vector](http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=98)
 - [The Fate of vector in C++09](http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=350)
 - [vector: More Problems, Better Solutions](http://www.gotw.ca/publications/N1211.pdf)
+- [一篇总结二叉树的4种遍历方式（含模板）](https://mp.weixin.qq.com/s/0b5OsnFLLg18Td4CuR51_Q)
+- [详解 AVL 树（基础篇）](https://zhuanlan.zhihu.com/p/34899732)
+- [红黑树的演变](https://www.cnblogs.com/tiancai/p/9072813.html)
 
