@@ -1039,7 +1039,233 @@ AVL 树：是平衡二叉查找树的一种，每次插入、删除都要做调�
 
 # 三、图 Graph
 
+无向图
 
+- 顶点 Vertex：图中的节点
+- 边 Edge：两个顶点的连线
+- 顶点的度 Degree：和顶点连接的边个数
+
+
+
+有向图
+
+- 顶点的入度 In-degree：指向这个顶点的边个数
+- 顶点的出度 Out-degree：以这个顶点作为起点的边个数
+
+
+
+带权图
+
+- 每条边上只有一个权重
+
+
+
+稀疏图 Sparse Matrix
+
+- 图中顶点很多，但图中的边很少
+
+
+
+## 1. 图的存储
+
+### 1.1 邻接矩阵 Adjacency Matrix
+
+采用二维数组的数据存储方式**存储边信息**，行列索引均为图中所有顶点的索引，不适合存储边少的稀疏图
+占用内存空间大，但访问顶点快速，**可以将图的运算转换为矩阵的运算**
+
+- 无向图：如果顶点 i 与顶点 j 之间有边，就将 $A[i][j]$和 $A[j][i]$ 标记为 1
+                 无向图只需要存储对角线上的一半数据就够了
+
+- 有向图：如果有从顶点 $i$ 指向顶点 $j$ 的边，就将 $A[i][j]$ 标记为 1
+                 如果有从顶点 $j$ 指向顶点 $i$ 的边，就将 $A[j][i]$ 标记为 1
+
+- 带权图：存储边上的权重
+
+![](./images/GraphAdjacencyMatrix.jpg)
+
+### 1.2 邻接表 Adjacency List
+
+采用散列表的数据存储方式**存储边信息**
+
+- 每个数据的索引为顶点的索引，数据每个元素存储当前顶点的出度顶点索引（逆邻接表存储入度顶点索引）
+- 占用空间小，但访问顶点较慢
+  如果存储的顶点多，可以采用和散列表一样的优化方法，在数组每个元素中存储红黑树来代替单链表的结构
+
+![](./images/GraphAdjacencyList.jpg)
+
+```c++
+class Graph { 
+private:
+  // 邻接表，如果要存储带权图，存储的数据由 int 转为 一个可以存权重和索引的结构体
+	std::vector<std::list<int> *> adj;
+
+public:
+  Graph(int capacity) {
+    adj.resize(capacity);
+    for (int i = 0; i < adj.size(); ++i) {
+      adj[i] = new std::list<int>();
+    }
+  }
+
+  // 无向图一条边存两次
+  void addEdge(int s, int t) { 
+    addVector(s, t);
+    addVector(t, s);
+  }
+  
+  // 有向图存储边
+  void addVector(int s, int t) {
+     adj.at(s)->push_back(t);
+  }
+  
+};
+```
+
+
+
+## 2. 图的暴力搜索
+
+
+### 2.1 广度优先搜索 Breadth-First-Search
+
+先查找离起始顶点最近的，然后是次近的，依次往外搜索
+
+- 广度优先搜索得到的路径是**最短路径**
+
+- 空间复杂度 $O(V_{顶点个数})$
+- 时间复杂度
+  最好 $O(V_{顶点个数})$
+  最坏 $O(V_{顶点个数} + E_{边个数})$
+
+![](./images/BreadthFirstSearch.png)
+
+```c++
+class Graph { 
+private:
+  std::vector<std::list<int> *> adj;
+  ...
+  
+  // 递归打印 s->t 的路径
+  void print(int* prev, int s, int t) {
+    if (prev[t] != -1 && t != s) {
+      print(prev, s, prev[t]);
+    }
+    printf("%d ", t);
+  }
+  
+public:
+  void BreadthFistSearch(int s, int t) {
+    if (s == t) return;
+
+    const int count = adj.size();
+    bool isVisited[count];	// 每个顶点是否被访问过
+    std::memset(isVisited, false, sizeof(isVisited));
+
+    int prev[count]; 			// 每个顶点的前向顶点索引
+    std::memset(prev, -1, sizeof(prev));
+
+    std::queue<int, std::list<int>> visitedVertex;
+    visitedVertex.push(s);
+    isVisited[s] = true;
+    while (visitedVertex.size() != 0) {
+    	int w = visitedVertex.front();
+      visitedVertex.pop();
+      // 遍历与当前顶点邻接的所有顶点
+      for (std::list<int>::iterator item = adj[w]->begin(); item != adj[w]->end(); ++item) {
+        int i = (*item);
+        if (!isVisited[i]) {
+          prev[i] = w;
+          if (i == t) {
+            print(prev, s, t);
+            return;
+          }
+          isVisited[i] = true;
+          visitedVertex.push(i);
+        } // if
+      } // for
+    } // while
+
+  }
+  
+};
+```
+
+
+
+### 2.2 深度优先搜索 Depth-First-Search 
+
+DSF 就像走迷宫：随意选择一个岔路口来走，走着走着发现走不通的时候，就回退到上一个岔路口，重新选择一条路继续走，直到最终找到出口
+
+- 深度优先搜索得到的路径**不一定是最短路径**
+
+- 空间复杂度 $O(V_{顶点个数})$
+- 时间复杂度 $O(E_{边个数})$
+
+![](./images/DepthFirstSearch.jpg)
+
+```c++
+class Graph { 
+private:
+  bool isFound = false;
+  std::vector<std::list<int> *> adj;
+  ...
+  
+public:
+  void DepthFistSearch(int s, int t) {
+    isFound = false;
+    
+    const int count = adj.size();
+    bool isVisited[count];	// 每个顶点是否被访问过
+    std::memset(isVisited, false, sizeof(isVisited));
+
+    int prev[count]; 			// 每个顶点的前向顶点索引
+    std::memset(prev, -1, sizeof(prev));
+    
+    recurDFS(s, t, isVisited, prev);
+    print(prev, s, t);
+  }
+
+  void recurDFS(int w, int t, bool* isVisited, int* prev) {
+    if (isFound == true) return;
+    
+    isVisited[w] = true;
+    if (w == t) {
+      isFound = true;
+      return;
+    }
+    for (std::list<int>::iterator item = adj[w]->begin(); item != adj[w]->end(); ++item) {
+      int i = (*item);
+      if (!isVisited[i]) {
+        prev[i] = w;
+        recurDFS(i, t, isVisited, prev);
+      } // if
+    } // for
+  }
+  
+};
+
+void TestCode() {
+  // 0 —— 1 —— 2
+  // |		|		 |
+  // 3 —— 4 —— 5
+  //		  |		 |
+  //			6 —— 7
+  Graph graph(8);
+  graph.addEdge(0,1);
+  graph.addEdge(0,3);
+  graph.addEdge(1,2);
+  graph.addEdge(1,4);
+  graph.addEdge(2,5);
+  graph.addEdge(3,4);
+  graph.addEdge(4,5);
+  graph.addEdge(4,6);
+  graph.addEdge(5,7);
+  graph.addEdge(6,7);
+  
+  graph.DepthFistSearch(0, 6);   // 0 1 2 5 4 6
+  graph.BreadthFistSearch(0, 6); // 0 1 4 6
+}
+```
 
 
 
