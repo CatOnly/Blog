@@ -560,6 +560,57 @@ int hash(Object key) {
 
 
 
+### 5.6 位图 Bitmap
+
+位图可以作为一种特殊的（只存储 bool 类型的）散列表
+
+- 一般语言里 bool 类型占用一个字节，在大量存储 bool 类型的情况下，比较浪费内存
+- 一般用作表示查找的大量数据是否存在用
+
+
+
+**布隆过滤器 Bloom Filter**
+
+- 通过 k 个 hash 函数来同时存储一个数字是否存在（hash 值都为 true 才存在）
+  相当于 k 个二进制位，来表示一个数字的存在
+  防止大范围的数据散列映射到较小规模数据时的 hash 冲突问题
+- 仍然会有 hash 冲突的问题，但概率较小，使用时需要参考项目对 hash 冲突的容忍度
+
+```c++
+// 注意：Java 中 char 类型占 16 bit，即 2 个字节
+#define CHAR_SIZE 8
+class BitMap {
+private:
+  char* bytes;
+	int nbits;
+  
+public:
+  BitMap(int nbits) {
+    this.nbits = nbits;
+    this.bytes = new char[nbits/CHAR_SIZE + 1];
+  }
+
+	void set(int k) {
+    if (k > nbits) return;
+    int byteIndex = k / CHAR_SIZE;
+    int bitIndex = k % CHAR_SIZE;
+    bytes[byteIndex] |= (1 << bitIndex);
+  }
+
+  // 数组下标定位数据，访问快速
+	bool get(int k) {
+    if (k > nbits) return false;
+    int byteIndex = k / CHAR_SIZE;
+    int bitIndex = k % CHAR_SIZE;
+    return (bytes[byteIndex] & (1 << bitIndex)) != 0;
+  }
+};
+```
+
+
+
+
+
 # 二、树形存储结构
 
 ![](./images/Tree.jpg)
@@ -1032,6 +1083,8 @@ AVL 树：是平衡二叉查找树的一种，每次插入、删除都要做调�
 
 ![](./images/TreeRedBlack.jpg)
 
+### 2.5 B+ 树
+
 
 
 
@@ -1206,14 +1259,11 @@ DSF 就像走迷宫：随意选择一个岔路口来走，走着走着发现走�
 ```c++
 class Graph { 
 private:
-  bool isFound = false;
   std::vector<std::list<int> *> adj;
   ...
   
 public:
-  void DepthFistSearch(int s, int t) {
-    isFound = false;
-    
+  void DepthFistSearch(int s, int t) {    
     const int count = adj.size();
     bool isVisited[count];	// 每个顶点是否被访问过
     std::memset(isVisited, false, sizeof(isVisited));
@@ -1225,21 +1275,20 @@ public:
     print(prev, s, t);
   }
 
-  void recurDFS(int w, int t, bool* isVisited, int* prev) {
-    if (isFound == true) return;
-    
+  bool recurDFS(int w, int t, bool* isVisited, int* prev) {    
     isVisited[w] = true;
-    if (w == t) {
-      isFound = true;
-      return;
-    }
+    
+    if (w == t) return true;
+    
     for (std::list<int>::iterator item = adj[w]->begin(); item != adj[w]->end(); ++item) {
       int i = (*item);
       if (!isVisited[i]) {
         prev[i] = w;
-        recurDFS(i, t, isVisited, prev);
-      } // if
-    } // for
+        if (recurDFS(i, t, isVisited, prev)) return true;
+      }
+    }
+    
+    return false;
   }
   
 };
