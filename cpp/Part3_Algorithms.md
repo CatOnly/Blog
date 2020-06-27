@@ -177,9 +177,11 @@
 
 <u>根据开发所面临的具体问题</u>，可以将递归转换为**迭代循环**的方式
 
-1. 用迭代循环来替代递归并不能避免递归原有的缺陷
+1. 链表、二叉树相关的问题可以用递归来实现
 
-2. 迭代循环本质上与递归的方法没有任何区别
+2. 用迭代循环来替代递归并不能避免递归原有的缺陷
+
+3. 迭代循环本质上与递归的方法没有任何区别
    但具体细节为手动实现，使**迭代循环比递归更具有可控性**
 
    ```c
@@ -1390,7 +1392,7 @@ bool check_pos_valid(int rowOrigin, int colOrigin) {
 
 void eight_queens(int row) {
     if (row > 7) {
-        eight_queens_print();
+        eight_queens_print();     // 发现一种后，也会回溯到上一状态，继续查找下一种新的摆法
         gEightQueenCols[row] = 0; // 重置为默认数据
         return;
     }
@@ -1399,9 +1401,11 @@ void eight_queens(int row) {
         if (check_pos_valid(row, col)) {
             gEightQueenCols[row] = col;
             eight_queens(row + 1);
-            gEightQueenCols[row] = 0; // 重置为默认数据
+          	// 重置为默认数据，防止回溯时上一次的数据让 check_pos_valid 判断失误
+            gEightQueenCols[row] = 0;
         }
     }
+    // 当前行没有适合的列，通过递归调用返回，回溯到上一行的选择，选择其他可能情况
 }
 
 void TestCode() {
@@ -1421,11 +1425,14 @@ void TestCode() {
 int weightMax = 0;
 void package(int* itemsW, int itemsIdx, int itemsWCount, int weight, int capacity) {
   if (weight == capacity || itemsIdx == itemsWCount) {
-    if (weight > weightMax) weightMax = weight;
+    if (weight > weightMax) weightMax = weight; // 满足条件后也会回溯，但会记录下当前的最大值
     return;
   }
+  // 遍历到最深处，如果不符合情况会向后回溯
   package(itemsW, itemsIdx + 1, itemsWCount, weight, capacity);
-  if (weight + itemsW[itemsIdx] <= capacity) { // 已经超过可以背包承受的重量的时候，就不要再装了
+  
+  // 根据条件判断当前方法是否可行，不行就通过递归的回调回溯到上一状态
+  if (weight + itemsW[itemsIdx] <= capacity) {
     package(itemsW, itemsIdx + 1, itemsWCount, weight + itemsW[itemsIdx], capacity);
   }
 }
