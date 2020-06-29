@@ -935,6 +935,8 @@ double sqrt(double x, double precision) {
 
 
 
+
+
 ## 4. A* 单源最短路径算法
 
 
@@ -1344,6 +1346,8 @@ void merge(int* arr, int start, int middle, int end) {
 
 
 
+缺点：时间复杂度高，0-1 背包问题的时间复杂度为 $O(2^n)$
+
 适合场景：缺乏规律或目前不了解其规律的搜索场景
 
 
@@ -1421,25 +1425,37 @@ void TestCode() {
 
 有一个背包，背包总的承载重量是 w kg。现在我们有 n 个物品，每个物品的重量不等，并且不可分割。我们现在期望选择几件物品，装载到背包中。在不超过背包所能装载重量的前提下，如何让背包中物品的总重量最大？
 
+
+
+分析：
+
+我们需要将物品逐个尝试放入包中，求得包的最大重量，列举所有的可能如下图
+
+![](./images/knapsack.png)
+
 ```c++
 int weightMax = 0;
-void package(int* itemsW, int itemsIdx, int itemsWCount, int weight, int capacity) {
-  if (weight == capacity || itemsIdx == itemsWCount) {
-    if (weight > weightMax) weightMax = weight; // 满足条件后也会回溯，但会记录下当前的最大值
+int weightCapacity = 10;
+// 由于只有装包，不装包两种情况，因此 package 函数的递归调用类似于 先序遍历二叉树
+void knapsack(std::vector<int> &weights, size_t i, int wCurrent) {
+  if (wCurrent == weightCapacity || i == weights.size()) {
+    if (wCurrent > weightMax) weightMax = wCurrent; // 所有情况都会走一遍，但只会保存最大值
     return;
   }
-  // 遍历到最深处，如果不符合情况会向后回溯
-  package(itemsW, itemsIdx + 1, itemsWCount, weight, capacity);
-  
-  // 根据条件判断当前方法是否可行，不行就通过递归的回调回溯到上一状态
-  if (weight + itemsW[itemsIdx] <= capacity) {
-    package(itemsW, itemsIdx + 1, itemsWCount, weight + itemsW[itemsIdx], capacity);
+  // 情况一：选择不装第 i 个物品
+  knapsack(weights, i+1, wCurrent);
+
+  // 情况二：选择装第 i 个物品
+  if ((wCurrent+weights[i]) <= weightCapacity) {
+    knapsack(weights, i+1, wCurrent+weights[i]);
   }
 }
 
 void TestCode() {
-  int items[7] = { 30, 2, 3, 4, 40, 20, 9 };
-  package(items, 0, 7, 0, 100);
+  weightMax = 0;
+  weightCapacity = 100;
+  std::vector<int> weights = { 30, 2, 3, 4, 40, 20, 9 };
+  knapsack(weights, 0, 0);
   std::cout << "背包最大承重" << weightMax << " kg" << std::endl;
 }
 ```
@@ -1501,7 +1517,219 @@ public:
 
 ## 4. 动态规划 Dynamic Programming
 
+贪心算法是动态规划算法的一种特殊情况
 
+
+
+思路：
+
+1. 把问题分解为多个阶段，每个阶段对应一个决策
+2. 记录每一个阶段可达的状态集合（去掉重复的）
+3. 通过当前阶段的状态集合，来推导下一个阶段的状态集合，动态地往前推进
+
+
+
+使用场景，具有以下三种特征：
+
+1. **最优子结构**
+   可以通过子问题的最优解，推导出问题的最优解
+   后面阶段的状态可以通过前面阶段的状态推导出来
+2. **无后效性**
+   只关心前面阶段的状态值， 不关心状态怎么一步一步推倒出来的
+   某阶段状态一旦确定，就不受之后阶段的决策影响
+3. **重复子问题**
+   不同的决策序列，到达某个相同的阶段时，可能会产生重复的状态
+
+
+
+方法 1 状态转移表：适合问题涉及的变量较少的情况
+
+1. 先用回溯算法解决问题
+2. 定义状态（每个状态表示一个节点）
+3. 画出递归树，找到重复的子结构，寻找规律
+4. 为了避免重复子结构，做出状态表
+5. 根据决策的先后顺序，从前往后填充**状态表**
+6. 将递推填表的过程写成动态规划代码
+
+
+
+方法 2 状态转移方程：
+
+1. 先用回溯算法解决问题
+2. 定义状态（每个状态表示一个节点）
+3. 画出递归树，找到重复的子结构，寻找规律
+4. 求出递推公式
+5. 根据递推公式写出递归代码
+
+
+
+### 4.1 应用：0-1 背包
+
+问题 1：
+
+有一个背包，背包总的承载重量是 w kg。现在我们有 n 个物品，每个物品的重量不等，并且不可分割。我们现在期望选择几件物品，装载到背包中。在不超过背包所能装载重量的前提下，如何让背包中物品的总重量最大？
+
+
+
+分析：
+
+使用回溯法来解决 0-1 背包问题，就像先序遍历一棵包含所有选择情况的二叉树，时间复杂度很高 $O(2^n)$
+期间有些情况的计算是相同的，这会造成过多的重复计算 
+
+![](./images/knapsack.png)
+
+```c++
+int weightMax = 0;
+int weightCapacity = 100;
+std::vector<int> weights = { 30, 2, 3, 4, 40, 20, 9 };
+
+// 背包问题有（所有背包物品数目）个阶段，每个阶段有 1 个哨兵状态 和 weightCapacity 个状态
+std::vector<std::vector<bool>> status;
+status.resize(weights.size());
+for (int i = 0; i < weights.size(); ++i) {
+  status[i].resize(weightCapacity + 1);
+}
+
+// 由于只有装包，不装包两种情况，因此 package 函数的递归调用类似于 先序遍历二叉树
+void knapsack(size_t i, int wCurrent) {
+  if (wCurrent == weightCapacity || i == weights.size()) {
+    if (wCurrent > weightMax) weightMax = wCurrent; // 所有情况都会走一遍，但只会保存最大值
+    return;
+  }
+
+  if (status[i][wCurrent]) return;
+
+  // 记录 (i, wCurrent) = true 为选择了情况一，避免重复计算
+  status[i][wCurrent] = true;
+
+  // 情况一：选择不装第 i 个物品
+  knapsack(i+1, wCurrent);
+
+  // 情况二：选择装第 i 个物品
+  if ((wCurrent+weights[i]) <= weightCapacity) {
+    knapsack(i+1, wCurrent+weights[i]);
+  }
+}
+
+int knapsack2(std::vector<int> &weights, int weightCapacity) {
+  bool states[weights.size()][weightCapacity+1]; // 默认值 false，
+  states[0][0] = true;                           // 第一阶段要特殊处理，可以利用哨兵优化
+  if (weights[0] <= weightCapacity) {
+    states[0][weights[0]] = true;
+  }
+
+  // 动态规划状态转移
+  for (int i = 1; i < weights.size(); ++i) {
+    // 情况一：选择不装第 i 个物品
+    for (int j = 0; j <= weightCapacity; ++j) {
+      if (states[i-1][j]) states[i][j] = states[i-1][j];
+    }
+    // 情况二：选择装第 i 个物品
+    for (int j = 0; j <= weightCapacity-weights[i]; ++j) {
+      if (states[i-1][j]) states[i][j+weights[i]] = true;
+    }
+  }
+
+  // 根据之前记录的数据找到最优解
+  for (int i = weightCapacity; i >= 0; --i) {
+    if (states[weights.size()-1][i]) return i;
+  }
+
+  return 0;
+}
+
+// 不同阶段的状态有重复，可以和并为公用一个状态，最后只剩下包的重量这一种状态
+int knapsack3(std::vector<int> &weights, int weightCapacity) {
+  bool states[weightCapacity+1]; // 默认值false
+  states[0] = true;              // 第一阶段要特殊处理，可以利用哨兵优化
+  if (weights[0] <= weightCapacity) {
+    states[weights[0]] = true;
+  }
+
+  // 动态规划状态转移
+  for (int i = 1; i < weights.size(); ++i) {
+    // 情况二：选择装第 i 个物品
+    for (int j = weightCapacity-weights[i]; j >= 0; --j) {
+      if (states[j]) states[j+weights[i]] = true;
+    }
+  }
+
+  // 根据之前记录的数据找到最优解
+  for (int i = weightCapacity; i >= 0; --i) {
+    if (states[i]) return i;
+  }
+  return 0;
+}
+```
+
+
+
+问题 2：
+
+有一个背包，背包总的承载重量是 w kg。现在我们有 n 个物品，每个物品的重量不等、**不同价值**、不可分割。我们现在期望选择几件物品，装载到背包中。在不超过背包所能装载重量的前提下，如何让背包中物品的总**价值**最大？
+
+```c++
+// 1. 回溯法
+int valueMax = 0;													 // 包装中物品的总价值
+int weightCapacity = 10;
+std::vector<int> weights = {2，2，4，6，3}; // 物品的重量
+std::vector<int> values =  {3，4，8，9，6}; // 物品的价值
+void knapsack(size_t i, int wCurrent, int valCurrent) {
+  if (wCurrent == weightCapacity || i == weights.size()) {
+    if (wCurrent > valueMax) valueMax = valCurrent; // 所有情况都会走一遍，但只会保存最大值
+    return;
+  }
+  // 情况一：选择不装第 i 个物品
+  knapsack(i+1, wCurrent, valCurrent);
+
+  // 情况二：选择装第 i 个物品
+  if ((wCurrent+weights[i]) <= weightCapacity) {
+    knapsack(i+1, wCurrent+weights[i], valCurrent+values[i]);
+  }
+}
+
+// 2. 动态规划
+int knapsack2(std::vector<int> &weights, std::vector<int> &values, int weightCapacity) {
+  int valStates[weights.size()][weightCapacity+1];
+  // 初始化
+  for (int i = 0; i < weights.size(); ++i) { 
+    for (int j = 0; j < weightCapacity+1; ++j) { 
+      valStates[i][j] = -1;
+    }
+  }
+  valStates[0][0] = 0; 
+  if (weights[0] <= weightCapacity) { 
+    valStates[0][weights[0]] = values[0];
+  }
+
+  // 动态规划状态转移
+  for (int i = 1; i < weights.size(); ++i) {
+    // 情况一：选择不装第 i 个物品
+    for (int j = 0; j < weightCapacity+1; ++j) {
+      if (valStates[i-1][j] >= 0) 
+        valStates[i][j] = valStates[i-1][j];
+    }
+    // 情况二：选择装第 i 个物品
+    for (int j = 0; j < weightCapacity+1 - weights[i]; ++j) {
+      if (valStates[i-1][j] >= 0) {
+        int v = valStates[i-1][j] + values[i]; 
+        if (v > valStates[i][j+weights[i]]) { 
+          valStates[i][j+weights[i]] = v;
+        }
+      } 
+    }
+  }
+
+  // 根据之前记录的数据找到最优解
+  int valMax = -1;
+  for (int i = weightCapacity; i >= 0; --i) {
+    if (valStates[weights.size()-1][i] > valMax) 
+      valMax = valStates[weights.size()-1][i];
+  }
+
+  return valMax;
+}
+```
 
 
 
