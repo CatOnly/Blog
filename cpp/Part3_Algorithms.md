@@ -927,19 +927,335 @@ double sqrt(double x, double precision) {
 
 ## 2. 拓扑排序 Topological
 
+原理：
+
+- 在互相依赖的元素中，元素之间犹豫依赖而有序，根据依赖关系排序
+- 通过局部顺序来推导全局顺序（排序结果不唯一）
+- 可以判断图中是否有环
+
+
+
+使用数据结构：图的邻接表结构，这个图可能不是连通的，有可能是有好几个不连通的子图构成，所以，E 并不一定大于 V
+
+
+
+### 2.1 方法一：Kahn 算法（基于贪心算法）
+
+时间复杂度 $O(V+E)$
+
+```c++
+class Graph {
+private:
+  // 邻接表，如果要存储带权图，存储的数据由 int 转为 一个可以存权重和索引的结构体
+    std::vector<std::list<int> *> adj;
+
+public:
+  Graph(int capacity) {
+    adj.resize(capacity);
+    for (int i = 0; i < adj.size(); ++i) {
+      adj[i] = new std::list<int>();
+    }
+  }
+
+  // 有向图存储边
+  void addVector(int s, int t) {
+     adj.at(s)->push_back(t);
+  }
+
+  // 最后输出出来的顶点个数，少于图中顶点个数，图中还有入度不是 0 的顶点，那就说明，图中存在环
+  void topoSortByKahn() {
+    int v = adj.size(); // 顶点个数
+    int inDegree[v]; 	  // 统计每个顶点的入度
+    for (int i = 0; i < v; ++i) {
+      std::list<int>* list = adj[i];
+      for (auto iter = list->begin(); iter != list->end(); ++iter) {
+        int w = *iter;
+        ++inDegree[w];   // i->w
+      }
+    }
+
+    std::queue<int> queue;
+    for (int i = 0; i < v; ++i) {
+      if (inDegree[i] == 0) queue.push(i); // 入度为 0，可
+    }
+    while (!queue.empty()) {
+      int i = queue.front();
+      queue.pop();
+      printf("-> %d", i);
+      std::list<int>* list = adj[i];
+      for (auto iter = list->begin(); iter != list->end(); ++iter) {
+        int k = *iter;
+        --inDegree[k];
+        if (inDegree[k] == 0) queue.push(k);
+      } // for
+    } // while
+
+  }
+
+};
+```
+
+
+
+### 2.1 方法二：DFS 深度优先遍历
+
+时间复杂度 $O(V+E)$
+
+```c++
+void topoSortByDFS() {
+  // 先构建逆邻接表，边s->t表示，s依赖于t，t先于s
+  int v = adj.size();
+  std::vector<std::list<int> *> inverseAdj;
+  for (int i = 0; i < v; ++i) {
+    inverseAdj[i] = new std::list<int>();
+  }
+  for (int i = 0; i < v; ++i) {    // 通过邻接表生成逆邻接表
+    std::list<int>* list = adj[i];
+    for (auto iter = list->begin(); iter != list->end(); ++iter) {
+      int w = *iter;               // i->w
+      inverseAdj[w]->push_back(i); // w->i
+    }
+  }
+
+  bool visited[v];
+  // 深度优先遍历图
+  for (int i = 0; i < v; ++i) {
+    if (visited[i] == false) {
+      visited[i] = true;
+      dfs(i, inverseAdj, visited);
+    }
+  } // for
+}
+
+void dfs(int vertex, std::vector<std::list<int> *>& inverseAdj, bool* visited) {
+  std::list<int>* list = inverseAdj[vertex];
+  for (auto iter = list->begin(); iter != list->end(); ++iter) {
+    int w = *iter;
+    if (visited[w] == true) continue;
+    visited[w] = true;
+    dfs(w, inverseAdj, visited);
+  }
+  // 先把 vertex 这个顶点可达的所有顶点都打印出来之后，再打印它自己
+  printf("-> %d", vertex);
+}
+```
+
+
+
+## 3. Dijkstra 单源最短路径（基于动态规划）
+
+目的：求图上一个节点到另一个节点的最短路径
+
+适用场景：
+
+- 整个路径所在的图比较小
+  如果图非常大，那 Dijkstra 最短路径算法的执行耗时会很多
+- 图非常大的情况可以将图上的信息简化
+  先算出大致的方向路径，再这个大至的路径里逐个细分多个小的路径求最短路径
+
+
+
+**一、采用邻接表的图存储结构**
+
+```c++
+class Graph {
+
+public:
+  // 为了 dijkstra 实现用的
+  struct Edge {
+    int sid; // 边的起始顶点编号
+    int tid; // 边的终止顶点编号
+    int w;   // 权重
+    Edge(int sid, int tid, int w):sid(sid),tid(tid),w(w) { }
+  };
+  struct Vertex {
+    int id;   // 顶点编号
+    int dist; // 顶点到起点的距离
+    Vertex(int id, int dist):id(id),dist(dist) { }
+    bool operator>(const Vertex& a) const {
+       return dist > a.dist;
+    }
+  };
+
+private:
+  std::vector<std::list<Edge *> *> adj; // 邻接表
+
+public:
+  Graph(int capacity) {
+    adj.resize(capacity);
+    for (int i = 0; i < adj.size(); ++i) {
+      adj[i] = new std::list<Edge *>();
+    }
+  }
+  
+  void addEdge(int s, int t, int w) {
+    adj.at(s)->push_back(new Edge(s, t, w));
+  }
+};
+```
+
+
+
+**二、基于邻接表数据结构的具体实现**
+
+时间复杂度 $O(E_{边数} + logV_{顶点数})$
+
+方法：
+
+- 采用了广度遍历的方法，会考虑所有的路线
+- 每次查找当前节点的所有子节点中，距离起点最近的节点，如此循环
+
+![](./images/Dijkstra.jpg)
+
+```c++
+#include <vector>
+#include <list>
+#include <queue>
+#include <algorithm>
+class Graph {
+	...
+public:
+  void print(int s, int t, int* predecessor) {
+    if (s == t) return;
+    print(s, predecessor[t], predecessor);
+    printf("->%d", t);
+  }
+  
+  // 从顶点 s 到顶点 t 的最短路径
+  void dijkstra(int s, int t) {
+    using namespace std;
+    int predecessor[adj.size()]; // 用来还原最短路径
+    Vertex* vertexes[adj.size()];
+    for (int i = 0; i < adj.size(); ++i) {
+      vertexes[i] = new Vertex(i, INT_MAX);
+    }
+    priority_queue<Vertex*, vector<Vertex*>, greater<Vertex*>> queue; // 小顶堆
+    bool inqueue[adj.size()];  // 标记是否进入过队列
+    vertexes[s]->dist = 0;
+    queue.push(vertexes[s]);
+    inqueue[s] = true;
+    while (!queue.empty()) {
+      Vertex* minVertex = queue.front(); // 取堆顶元素并删除
+      queue.pop();
+      if (minVertex->id == t) break;     // 最短路径产生了
+      list<Edge *> *list = adj[minVertex->id];
+      for (auto iter = list->begin(); iter != list->end(); ++iter) {
+        Edge* e = *iter;                                  // 取出一条 minVetex 相连的边
+        Vertex* nextVertex = vertexes[e->tid];            // minVertex-->nextVertex
+        if (minVertex->dist + e->w < nextVertex->dist) {  // 更新 next 的 dist
+          nextVertex->dist = minVertex->dist + e->w;
+          predecessor[nextVertex->id] = minVertex->id;
+          if (inqueue[nextVertex->id] == true) {
+            queue.update(nextVertex);  // 更新队列中 nextVertex 的 dist 值
+          } else {
+            queue.push(nextVertex);
+            inqueue[nextVertex->id] = true;
+          }
+        } // if minVertex
+      } // for
+    } // while
+
+    // 输出最短路径
+    printf("%d", s);
+    print(s, t, predecessor);
+  }
+  
+};
+```
 
 
 
 
-## 3. Dijkstra 单源最短路径算法
+
+## 4. A* 启发式搜索算法（Dijkstra 的优化）
+
+> 启发函数（heuristic function）:生活中的路径距离简化为一个简单的直线距离
+> 曼哈顿距离（Manhattan distance）：两点 x，y 偏移的绝对值的和
+> 欧几里得距离：数学上的两点距离
+
+目的：快速找出一条接近于最短路线的次优路线
 
 
 
+**一、采用邻接表的图存储结构**
+
+```c++
+class Graph {
+	...
+  // 除了以下结构，A* 均于 dijkstra 采用相同的数据结构
+  struct Vertex {
+    int id;    // 顶点编号
+    int x,y;
+    int dist;  // 顶点到起点的距离
+    int distM; // 顶点到起点的距离 + 顶点到终点的距离
+    Vertex(int id, int x, int y):id(id),x(x),y(y){
+      dist = INT_MAX;
+      distM = INT_MAX;
+    }
+    bool operator>(const Vertex& a) const {
+       return distM > a.distM;
+    }
+  };
+};
+```
 
 
-## 4. A* 单源最短路径算法
 
+**二、基于邻接表数据结构的具体实现**
 
+方法：
+
+- 采用贪心算法，局部判断所有子节点中 **到终点起点之和** 最小的的值
+- 找到起点后，不在考虑其他情况（剪枝，从局部最优到全局最优）
+  虽然不是最优，但是接近最优的方式
+
+```c++
+// 从顶点 s 到顶点 t 的最短路径
+void aStar(int s, int t) {
+  using namespace std;
+  int predecessor[adj.size()]; // 用来还原最短路径
+  Vertex* vertexes[adj.size()];
+  for (int i = 0; i < adj.size(); ++i) {
+    vertexes[i] = new Vertex(i, INT_MAX);
+  }
+  priority_queue<Vertex*, vector<Vertex*>, greater<Vertex*>> queue; // 小顶堆
+  bool inqueue[adj.size()];  // 标记是否进入过队列
+  vertexes[s]->dist = 0;
+  queue.push(vertexes[s]);
+  inqueue[s] = true;
+  while (!queue.empty()) {
+    Vertex* minVertex = queue.front(); // 取堆顶元素并删除
+    queue.pop();
+    if (minVertex->id == t) break;     // 最短路径产生了
+    list<Edge *> *list = adj[minVertex->id];
+    for (auto iter = list->begin(); iter != list->end(); ++iter) {
+      Edge* e = *iter;                                  // 取出一条 minVetex 相连的边
+      Vertex* nextVertex = vertexes[e->tid];            // minVertex-->nextVertex
+      if (minVertex->dist + e->w < nextVertex->dist) {  // 更新 next 的 dist
+        nextVertex->dist = minVertex->dist + e->w;
+        predecessor[nextVertex->id] = minVertex->id;
+        
+        // 与 dijkstra 的不同
+        nextVertex.distM = nextVertex.dist + hManhattan(nextVertex, vertexes[t]);
+        
+        if (inqueue[nextVertex->id] == true) {
+          queue.update(nextVertex);  // 更新队列中 nextVertex 的 dist 和 distM 值
+        } else {
+          queue.push(nextVertex);
+          inqueue[nextVertex->id] = true;
+        }
+      } // if minVertex
+      
+      // 与 dijkstra 的不同
+      if (nextVertex->id == t) { // 只要到达 t 就可以结束 while 了        
+        queue.clear(); 					 // 清空 queue，才能推出 while 循环 
+        break;
+      }
+      
+    } // for
+  } // while
+}
+```
 
 
 

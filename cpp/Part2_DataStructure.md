@@ -1085,6 +1085,70 @@ AVL 树：是平衡二叉查找树的一种，每次插入、删除都要做调�
 
 ### 2.5 B+ 树
 
+> B- 树就是 B 树，英文翻译都是 B-Tree
+>
+> 当 B+ 树存储的数据量非常大时，B+ 树的索引节点（非叶子节点）就会占用较多的内存，可以将索引节点先存储在磁盘中，使用的时候读取部分索引数据，所以树的高度决定了读取磁盘的最少次数
+>
+> 操作系统都是按页读取的，为了尽量减少 IO 操作，每个节点的大小要和页的大小（一般是 4 k）一致
+
+功能：
+
+1. 解决平衡二叉树**快速查找区间范围数据**的问题
+2. 降低同样的元素数量中平衡二叉树的高度，采用了多个子节点方式
+
+
+
+B+ 树结构：
+
+- 每个节点中子节点的个数不能超过 m，也不能小于 m/2
+  根节点的子节点个数可以不超过 m/2，这是一个例外
+- m 叉树只存储索引，并不真正存储数据，这个有点儿类似跳表
+- 通过链表将叶子节点串联在一起，这样可以方便按区间查找
+  一般情况，根节点会被存储在内存中，其他节点存储在磁盘中
+
+
+
+![](./images/TreeBPlus.png)
+
+```c++
+/**
+ * 非 叶子节点的定义。
+ *
+ * 假设keywords=[3, 5, 8, 10]
+ * 4个键值将数据分为5个区间：(-INF,3), [3,5), [5,8), [8,10), [10,INF)
+ * 5个区间分别对应：children[0]...children[4]
+ *
+ * m值是事先计算得到的，计算的依据是让所有信息的大小正好等于页的大小：
+ * PAGE_SIZE = (m-1)*4[keywordss大小]+m*8[children大小]
+ */
+class BPlusTreeNode {
+public:
+  static int m = 5; 					// m 叉树
+  int keywords[m-1]; 					// 键值，用来划分数据区间
+  BPlusTreeNode* children[m];	// 保存子节点指针
+}
+
+/**
+ * 叶子节点的定义。
+ *
+ * B+树中的叶子节点跟内部节点是不一样的,
+ * 叶子节点存储的是值，而非区间。
+ * 这个定义里，每个叶子节点存储3个数据行的键值及地址信息。
+ *
+ * k值是事先计算得到的，计算的依据是让所有信息的大小正好等于页的大小：
+ * PAGE_SIZE = k*4[keyw..大小]+k*8[dataAd..大小]+8[prev大小]+8[next大小]
+ */
+class BPlusTreeLeafNode {
+public:
+  static int k = 3;
+  int keywords[k]; 			// 数据的键值
+  long dataAddress[k]; 	// 数据地址
+
+  BPlusTreeLeafNode* prev; // 这个结点在链表中的前驱结点
+  BPlusTreeLeafNode* next; // 这个结点在链表中的后继结点
+}
+```
+
 
 
 
@@ -1265,10 +1329,10 @@ private:
 public:
   void DepthFistSearch(int s, int t) {    
     const int count = adj.size();
-    bool isVisited[count];	// 每个顶点是否被访问过
+    bool isVisited[count]; // 每个顶点是否被访问过
     std::memset(isVisited, false, sizeof(isVisited));
 
-    int prev[count]; 			// 每个顶点的前向顶点索引
+    int prev[count]; 			 // 每个顶点的前向顶点索引
     std::memset(prev, -1, sizeof(prev));
     
     recurDFS(s, t, isVisited, prev);
