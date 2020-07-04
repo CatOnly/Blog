@@ -75,12 +75,12 @@
 改变线程优先级的方法有：
 
 1. 用户指定优先级，[*pthread_setschedparam()*](http://www.qnx.com/developers/docs/6.4.1/neutrino/lib_ref/p/pthread_setschedparam.html) 
-  线程的优先级可以手动设置，系统会根据线程的实际表现自动调整
-  注意：优先级为 0 的线程是为空闲线程保留的
+    线程的优先级可以手动设置，系统会根据线程的实际表现自动调整
+    注意：优先级为 0 的线程是为空闲线程保留的
 2. 根据进入等待的频繁程度提升或降低优先级
-  IO 密集（频繁等待）线程的优先级 >  CPU 密集（很少等待）线程的优先级
+    IO 密集（频繁等待）线程的优先级 >  CPU 密集（很少等待）线程的优先级
 3. 长时间得不到执行的线程提升优先级
-  防止 Starvation 饿死现象：一个饿死的线程总是有比它优先级高的线程执行，导致这个线程始终无法执行
+    防止 Starvation 饿死现象：一个饿死的线程总是有比它优先级高的线程执行，导致这个线程始终无法执行
 
 
 
@@ -123,18 +123,19 @@ Linux 中只有任务 Task，没有线程和进程的实体
 > 对应的多线程使用的动态库函数
 > 程序 $\to$ C/C++ thread 标准库 $\to$ POSIX pthread 标准库 $\to$ 系统服务
 
-**pthread.h 函数库**
+#### 2.4.1 pthread.h 函数库
 
 1. 线程创建
 
-  ```c++
-  int pthread_create(pthread_t *thread,               // 线程 ID 变量存储的地址
-                     const pthread_attr_t *attr,      // 线程属性
-                     void *(*start_routine) (void *), // 创建线程运行所需的主函数
-                     void *arg);                      // 线程运行时需要传入的参数（线程间共享的数据）
-  ```
+   ```c++
+   #include <pthread.h>
+   int pthread_create(pthread_t *thread,              // 线程 ID 变量存储的地址
+                      const pthread_attr_t *attr,     // 线程属性
+                      void *(*start_routine) (void *),// 创建线程运行所需的主函数
+                      void *arg);                     // 线程运行时需要传入的参数（线程间共享的数据）
+   ```
 
-  
+   
 
 2. 线程同步
 
@@ -159,7 +160,85 @@ Linux 中只有任务 Task，没有线程和进程的实体
    int pthread_barrier_wait(pthread_barrier_t *barrier);
    ```
 
+
+
+
+#### 2.4.2 std::thread 函数库
+
+1. 线程对象创建
+
+   ```c++
+   #include <thread>
+   #include <chrono>
    
+   int iPrint(int param){
+     using namespace std;
+     cout << "Thread id:" << this_thread::get_id() << " param:" << param << endl;
+     
+     chrono::milliseconds dura(3000); // 定义一个3秒的时间
+     this_thread::sleep_for(dura);    // 模拟长时间计算
+     
+     return param;
+   }
+   int iPrint(std::future<int>&f){
+     using namespace std;
+     int param = f.get(); // 等待，直到其他线程的 promise 履行
+   
+     cout << "Thread id:" << this_thread::get_id() << " param:" << param << endl;
+     
+     chrono::milliseconds dura(3000); // 定义一个3秒的时间
+     this_thread::sleep_for(dura);    // 模拟长时间计算
+       
+     return param;
+   }
+   
+   // 一、普通创建线程
+   std::thread* iThread = new std::thread(iPrint, 1);
+   
+   
+   #include<future>
+   
+   int param = 0;
+   std::promise<int> p; // 主线程中的 int 变量
+   std::future<int> fuPro = p.get_future(); // future 中的变量值约定从将来获得
+   
+   // 二、异步函数模板创建线程
+   // launch::async    立刻创建线程并执行
+   // launch::deferred 当调用 get | wait 的时候创建线程执行
+   std::future<int> fu1 = std::async(launch::async, iPrint, 4);
+   std::future<int> fu2 = std::async(launch::async, iPrint, std::ref(fuPro));
+   
+   std::cout << "Run in main thread ..." << std::endl;
+   std::cout << "Run in main thread ..." << std::endl;
+   std::cout << "Run in main thread ..." << std::endl;
+   
+   p.set_value(13); // 履行 promise 将来传值的约定
+   
+   // fu1.wait(); // 只等待，不会获取子线程返回结果，类似 iThread.join
+   param = fu1.get(); // 等待子线程结果，获得子线程函数返回结果
+   
+   std::cout << "Future 1 result is:" << param << std::endl;
+   std::cout << "Future 2 result is:" << fu2.get() << std::endl;
+   ```
+
+   
+
+2. 线程同步
+
+   ```c++
+   // 当前线程等待 iThread 结束后在结束
+   // 一但设置为 join 或 detach，便不能再次设置 detach 或 join 其他同步类型
+if (iThread.joinable()) {
+     iThread.join();
+   }
+   
+   // iThread 单独结束，结束后系统自动回收其资源
+   iThread.detach();
+   ```
+   
+   
+
+
 
 ## 3. 多 CPU 多线程并发
 
@@ -206,11 +285,21 @@ Linux 中只有任务 Task，没有线程和进程的实体
 
 # 二、线程安全
 
-原子操作：不会被系统的线程调度打断的操作，例 C 或 C++ 代码的原子操作编译成汇编的机器代码后**是一条汇编指令**
+原子操作：对某个变量进行一元操作符运算的时候，能够不被打断，不会被系统的线程调度打断的操作，例 C 或 C++ 代码的原子操作编译成汇编的机器代码后**是一条汇编指令**
 
 内核只与线程交互，并不关心交互的线程是否在同一进程
 
 **系统调用和硬件中断会导致线程优先级的重新调度**
+
+
+
+```c++
+// C++11 原子操作，限制并发程序对共享数据的使用，避免数据竞争
+#include <atomic>
+std::atomic<int> iCount(10);
+```
+
+
 
 
 
@@ -250,6 +339,60 @@ Linux 中只有任务 Task，没有线程和进程的实体
 同一个互斥锁：谁获取，谁释放
 
 相比二元信号量，互斥锁解决了[线程执行过程中优先级颠倒的问题](https://www.cnblogs.com/codescrew/p/8970514.html)
+
+```c++
+#include<mutex>
+std::mutex mu; // 互斥对象
+std::once_flag onceFlag;
+
+// 1. 通过函数调用 cout，并为 cout 加锁，防止同时访问 cout
+void share_print1(std::string msg, int id) {
+	mu.lock();
+	std::cout << msg << id << std::endl;
+	mu.unlock();
+}
+
+// 2. lock_guard 可以对 mutex 进行管理，自动实现其构造调用 lock，析构调用 unlock
+void share_print2(std::string msg, int id) {
+	std::lock_guard<std::mutex> guard(mu);
+  
+  // adopt_lock 即抛弃 lock 操作，因为上句已加锁，防止多层嵌套的死锁
+  std::lock_guard<std::mutex> guard2(mu, std::adopt_lock);
+  
+  // unique_lock 和 lock_guard 作用差不多，但 unique_lock 可以随时加锁，可以交换锁的管理权限
+  // std::defer_lock 不填，默认加锁
+  std::unique_lock<std::mutex> locker(mu, std::defer_lock); // 先不加锁
+  std::unique_lock<std::mutex> locker2 = std::move(locker);
+  locker2.lock();
+  
+  // 保证即使是多线程情况下，也只被执行一次
+  std::call_once(onceFlag,[&]{ std::cout << "多线程情况下，也只被执行一次" << std::endl; });
+  
+  locker2.unlock();
+  
+	std::cout << msg << id << std::endl;
+}
+
+//子线程函数
+void function_1() {
+  for(int i = 0; i < 50; i++) {
+		share_print1("From == t1 1:" ,i);
+    share_print2("From == t1 2:" ,i);
+  }
+}
+
+int main() {
+	std::thread t1(function_1);
+	for (int i = 0; i < 100; i++) {
+  	share_print1("From ++ main 1:", i);
+		share_print2("From ++ main 2:", i);
+  }
+
+	t1.join();// 等待子线程结束
+  
+	return 0;
+}
+```
 
 
 
@@ -394,6 +537,8 @@ int main() {
 
 模拟睡眠锁功能的条件变量实现：
 
+1. **POSIX 库 pthread**
+
 ```c++
 #include <stdio.h>
 #include <pthread.h>
@@ -403,27 +548,14 @@ volatile int data_ready = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condvar = PTHREAD_COND_INITIALIZER; // 与 data_ready 对应
 
-void consumer() {
-    printf ("In consumer thread...\n");
-    while(1) {
-        pthread_mutex_lock(&mutex);
-        while(!data_ready) {
-            pthread_cond_wait(&condvar, &mutex);
-        }
-        // process data
-        printf("consumer:  got data from producer\n");
-        data_ready = 0;
-        pthread_cond_signal(&condvar);
-        pthread_mutex_unlock(&mutex);
-    }
-}
-
 void producer() {
     printf ("In producer thread...\n");
-    while(1) {
+    int count = 10;
+    while(count > 0) {
         // wait for interrupt from hardware here...          
         printf("producer:  got data from h/w\n");
         pthread_mutex_lock(&mutex);
+      
         while (data_ready) {
             pthread_cond_wait(&condvar, &mutex);
         }
@@ -431,6 +563,28 @@ void producer() {
         pthread_cond_signal(&condvar); // 唤醒优先级最高的一个线程来处理获得的数据
       																 // pthread_cond_broadcast 唤醒所有线程
         pthread_mutex_unlock(&mutex);
+      
+      	--count;
+    }
+}
+
+void consumer() {
+    printf ("In consumer thread...\n");
+  	int count = 10;
+    while(count > 0) {
+        pthread_mutex_lock(&mutex);
+      
+        while(!data_ready) {
+            pthread_cond_wait(&condvar, &mutex);
+        }
+        // process data
+        printf("consumer:  got data from producer\n");
+        data_ready = 0;
+        pthread_cond_signal(&condvar);
+      
+        pthread_mutex_unlock(&mutex);
+      
+      	--count;
     }
 }
 
@@ -443,6 +597,69 @@ int main() {
 
     // let the threads run for a bit
     sleep (20);
+}
+```
+
+
+
+2. **std::thread 库**
+
+```c++
+#include<mutex>
+#include <condition_variable>
+
+volatile int data_ready = 0;
+std::mutex mu;								   // 互斥对象
+std::condition_variable condvar; // 条件变量：避免线程无谓的循环
+
+void producer() {
+		printf ("In producer thread...\n");
+  	int count = 10;
+    while(count > 0) {
+        // wait for interrupt from hardware here...          
+        printf("producer:  got data from h/w\n");
+        unique_lock<mutex> locker(mu);
+      
+      	while (data_ready) {
+            condvar.wait(locker);
+        }
+        data_ready = 1;
+        condvar.notify_one(); // 激活一个等待这个条件的线程
+      										    // notify_all 激活所有
+        locker.unlock();
+      
+	      --count;
+    }
+}
+
+void consumer() {
+		printf ("In consumer thread...\n");
+  	int count = 10;
+  	while(count > 0) {
+        unique_lock<mutex> locker(mu);
+      
+        while(!data_ready) {
+            condvar.wait(locker);
+        }
+        // process data
+        printf("consumer:  got data from producer\n");
+        data_ready = 0;
+        condvar.notify_one();
+      
+        locker.unlock();
+      
+	      --count;
+    }
+}
+
+int main() {
+	  printf("Starting consumer/producer example...\n");
+		thread t1(producer);
+    thread t2(consumer);
+    t1.join();
+    t2.join();
+  
+    return 0;
 }
 ```
 
