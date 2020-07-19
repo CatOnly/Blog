@@ -193,6 +193,8 @@ Linux 中只有任务 Task，没有线程和进程的实体
    }
    
    // 一、普通创建线程
+   // 注意：线程对象在被析构前，需要显式的等待线程完成，或者分离它
+   //      进行复制时也需要满足条件（不能通过复制新线程来丢弃一个已有的线程）
    std::thread* iThread = new std::thread(iPrint, 1);
    
    
@@ -291,15 +293,11 @@ if (iThread.joinable()) {
 
 **系统调用和硬件中断会导致线程优先级的重新调度**
 
-
-
 ```c++
 // C++11 原子操作，限制并发程序对共享数据的使用，避免数据竞争
 #include <atomic>
 std::atomic<int> iCount(10);
 ```
-
-
 
 
 
@@ -339,6 +337,18 @@ std::atomic<int> iCount(10);
 同一个互斥锁：谁获取，谁释放
 
 相比二元信号量，互斥锁解决了[线程执行过程中优先级颠倒的问题](https://www.cnblogs.com/codescrew/p/8970514.html)
+
+注意：切勿将一个受互斥锁保护的数据，通过其他接口传到互斥锁保护范围之外
+
+死锁：如果一个进程在等待只能由该进程停止才能引发的事件，那么该进程就是死锁的
+
+- 避免嵌套锁
+  已经锁定了一个 mutex 的时候，你最好不要再次锁定
+  如果要锁定多个，你就用 `std::lock`
+- 按固定顺序锁定
+  如果你要锁定两个以上的 mutex 而你又不能用 `std::lock`。那么最好的建议就按固定顺序去锁定
+  1. 使用<u>层锁</u>确保顺序
+     hierarchical_mutex 规则思想是：将 mutex 分层，规定加锁顺序是由高层到底层才能进行，底层到高层报出运行时错误，这样就可以利用编程的方法检测死锁
 
 ```c++
 #include<mutex>
@@ -532,6 +542,7 @@ int main() {
 条件变量（缩写：condvars）
 
 - 一个条件变量同步一个共享对象，想同步多个共享对象，需要一个个创建对应的条件变量
+- **多用于线程通信**
 
 
 
@@ -674,13 +685,16 @@ int main() {
 
 ## 10. 中断 interrupts
 
-中断：操作系统内核停止正在发生的一切，并转移到中断所服务的程序（内核切换当前任务到中断服务的时间叫中断等待，不通的处理器有不通的中断等待时间长度）
+中断：操作系统内核停止正在发生的一切，并转移到中断所服务的程序（内核切换当前任务到中断服务的时间叫中断等待，不同的处理器有不同的中断等待时间长度）
 
-注意：中断服务程序所需要执行的时间应尽可能的短
+注意：
+
+- 中断服务程序所需要执行的时间应尽可能的短
+- java 线程的中断只是一个中断标识位的改变，中断后依旧会执行
 
 
 
-## 11. 防止编译器过度优化
+## 11. 防止编译器过度优化 volatile
 
 CPU 的动态调度：在执行程序的时候，为了提高效率有可能**交换指令的执行顺序**
 编译器在进行优化的时候，可能为了效率而交换毫不相干的两条相邻指令的执行顺序
@@ -688,7 +702,7 @@ CPU 的动态调度：在执行程序的时候，为了提高效率有可能**�
 关键字 **volatile**，防止编译器过度优化（无法阻止 CPU 动态调度换序）
 
 - 阻止编译器为了提高速度将一个变量缓存到寄存器内而不写回
-- 阻止编译器调整操作 volatile 变量的指令顺序
+- 阻止编译器调整操作 volatile 变量的指令顺序（volatile 确保所有的 write 操作都将发生在 read 操作之前）
 
 
 
@@ -700,10 +714,10 @@ CPU 的动态调度：在执行程序的时候，为了提高效率有可能**�
 volatile T* pInst = 0;
 T* GetInstance()
 {
-  if (!pInst)		// double-check 双重校验，这个 if 减少 lock 的调用
+  if (!pInst)	  // double-check 双重校验，确保只有在未初始化时同步数据，减少同步数据频率，提高效率
   {
     lock();
-    if (!pInst)
+    if (!pInst) // 判断上一个释放锁的线程（如果有的话）是否已经成功初始化单例
     {
       // 错误的方式
       // pInst = new T; // 此行代码包涵三步骤：
@@ -727,7 +741,7 @@ T* GetInstance()
 
 
 
-# 三、线程模型
+# 三、系统内核线程和应用程序线程模型
 
 ## 1. 一对一模型
 
@@ -775,6 +789,77 @@ T* GetInstance()
 
 
 
+# 四、并发编程模型
+
+其他线程在等待该线程释放锁，但该线程却被挂起了，便会发生死锁
+
+## 1. 并行工作者
+
+方法：由一个委派者将多分流程相同，数据不同的任务分配到不同的工作者上并行执行
+
+优点：
+
+- 容易理解，便于快速上手使用
+
+- 从代码上能清楚的反映出整个任务的流程顺序
+
+  
+
+缺点：
+
+- 多线程直接的共享数据控制复杂
+- 共享数据的工作者每次都要从共享内存获取共享数据来读/写，将会导致效率降低
+- 多个并行的任务执行顺序是不确定的，不便于维护和调试
+
+
+
+## 2. 流水线并发
+
+![](./images/pipeline_live.png)
+
+方法：每个工作者只处理总流程的其中一个工序，多个工作者做到无共享数据的并发
+			实际可能所有工作拆分为多条流水线并发处理，然后在每条流水线内，多个工作者并发处理数据
+
+优点：
+
+- 任务执行顺序固定，会使任务整体上得到简化
+
+- 无需共享数据
+
+- 每个工作都有自己的私有数据，不用从共享内存读/写数据
+  可以的根据硬件设备做优化，执行效率会相对较高
+
+  
+
+缺点：
+
+- 从代码上不能清楚的反映出整个任务的流程顺序
+- 加大了代码编写的难度
+  若在代码中嵌入过多的回调处理，往往会出现所谓的回调地狱（callback hell）现象
+
+
+
+## 3. 函数式并行
+
+方法：任务的并行操作交给单个函数来执行而不是一个类
+
+优点：
+
+- 每个函数调用都可以独立执行
+- 无需共享数据
+
+
+
+缺点：
+
+- 协调函数调用需要一定的开销
+
+
+
+
+
+
+
 # 引用
 
 - [cplusplus](http://www.cplusplus.com/reference/mutex/)
@@ -785,4 +870,9 @@ T* GetInstance()
 - [Interrupts](http://www.qnx.com/developers/docs/6.4.1/neutrino/getting_started/s1_inter.html)
 - [POSIX Threads Programming](https://computing.llnl.gov/tutorials/pthreads/)
 - [Using the Clone() System Call](https://www.linuxjournal.com/article/5211)
+- [non-blocking-algorithms](http://tutorials.jenkov.com/java-concurrency/non-blocking-algorithms.html)
+- [Java 并发编程](https://wiki.jikexueyuan.com/project/java-concurrency/thread-interrupt.html)
+- [并发编程模型](https://wiki.jikexueyuan.com/project/java-concurrent/concurrency-models.html)
+- [正确使用 Volatile 变量](https://www.ibm.com/developerworks/cn/java/j-jtp06197.html)
+- [Java 中的双重检查锁（double checked locking）](https://www.cnblogs.com/xz816111/p/8470048.html)
 

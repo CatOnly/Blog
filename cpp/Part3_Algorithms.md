@@ -1627,7 +1627,7 @@ void merge(int* arr, int start, int middle, int end) {
 
 
 
-### 2.2  应用：求出二维平面中相距最近的两个点
+### 2.2 应用：求出二维平面中相距最近的两个点
 
 利用归并排序的流程
 
@@ -1637,7 +1637,7 @@ void merge(int* arr, int start, int middle, int end) {
 
 
 
-### 2.3  应用：计算多维度矩阵乘积
+### 2.3 应用：计算多维度矩阵乘积
 
 利用归并排序的流程，详细的计算见[斯特拉森矩阵运算](https://www.csdn.net/gather_29/MtTaIgxsNDI5ODYtYmxvZwO0O0OO0O0O.html)
 

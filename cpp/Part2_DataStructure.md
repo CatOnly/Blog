@@ -1503,10 +1503,14 @@ int main(int argc, char* argv[]) {
 - 对于迭代器来说，可以修改实值，而不能修改 key
 
 ```c++
+// 内存占用最低
 std::map<string, int> mapTemp;
 
-// 由散列表实现的 hash_map, 在其他语言里多为字典类型的容器由散列表实现
+// 由散列表实现的 hash table, 占用内存较多, 使用一个下标范围比较大的数组来存储元素, 形成很多的桶
 std::hash_map<string, int> hashMapTemp;
+
+// C++11 由散列表实现的 hash table, 内存占用较 hash_map 低, 查找、插入速度比 hash_map 高
+std::unordered_map<string, int> hashMapUnorder;
 ```
 
 

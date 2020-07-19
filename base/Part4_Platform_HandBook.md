@@ -19,7 +19,7 @@
 1. [Android 程序入口以及项目文件夹的含义](https://www.cnblogs.com/mingjiatang/p/5978538.html)
 2. [gradle 配置](https://www.cnblogs.com/wxishang1991/p/5457878.html)
     [gradle 参数解释](https://www.jianshu.com/p/c11862136abf)
-  [gradle 项目构建](https://www.cnblogs.com/smyhvae/p/4456420.html)
+    [gradle 项目构建](https://www.cnblogs.com/smyhvae/p/4456420.html)
 
 
 
@@ -28,8 +28,9 @@
 
 1. [Android四大组件：这是一份全面 & 详细的Activity学习指南](https://blog.csdn.net/carson_ho/article/details/82848840)
 2. [Camera2 简介](https://www.jianshu.com/p/23e8789fbc10)
-3. [手机旋转角度](https://www.jianshu.com/p/f2cce22280df)
-4. [SensorManager](https://developer.android.google.cn/reference/android/hardware/SensorManager)
+3. [相机的旋转角度](https://blog.csdn.net/zhizhuodewo6/article/details/98615257)
+4. [手机旋转角度](https://www.jianshu.com/p/f2cce22280df)
+5. [SensorManager](https://developer.android.google.cn/reference/android/hardware/SensorManager)
 
 
 
