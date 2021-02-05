@@ -836,4 +836,6 @@ dec 目的操作数 ;decrease 目的操作数 = 目的操作数 - 1
 - [汇编语言入门教程，阮一峰](http://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html)
 - [为什么寄存器比内存快？](http://www.ruanyifeng.com/blog/2013/10/register.html)
 - [GCC 编译器 30 分钟入门教程](http://c.biancheng.net/gcc/)
+- [iOS 打包静态库](https://www.cnblogs.com/weiming4219/p/7827197.html)
+- [iOS开发：Archive、ipa 和 App 包瘦身]( https://zhuanlan.zhihu.com/p/86317689)
 
