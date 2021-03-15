@@ -1573,15 +1573,61 @@ std::priority_queue<int> my_priority_queue;
 
 
 
+## 4. 迭代器
+
+### 4.1 数组的迭代器
+
+内存分配连续，insert 和 erase 操作，都会使得删除点和插入点之后的元素挪位置
+插入点和删除掉之后的迭代器全部失效，也就是说 `insert(*iter)`、`erase(*iter)`，然后在 `iter++`，没有意义
+
+**解决方法**：
+`erase(*iter)`  的返回值是下一个有效迭代器的值，`iter = cont.erase(iter);`
+
+
+
+### 4.2 链表的迭代器
+
+内存分配不连续，删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器
+
+**解决办法**：
+
+1. `erase(*iter)` 会返回下一个有效迭代器的值
+2. `erase(iter++)`
+
+
+
+### 4.3 树形结构的迭代器
+
+使用红黑树来存储数据
+
+- <u>插入不会使得任何迭代器失效</u>
+
+- 删除运算使指向删除位置的迭代器失效，但是不会失效其他迭代器
+
+
+
+**解决办法**：
+erase 迭代器只是被删元素的迭代器失效，但是返回值为 void，所以要采用  `erase(iter++)` 的方式删除迭代器
+
+
+
 
 
 # 引用
 
 - [代码在线运行网页工具](https://tool.lu/coderunner/)
+
 - [What You Should Know about vector](http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=98)
+
 - [The Fate of vector in C++09](http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=350)
+
 - [vector: More Problems, Better Solutions](http://www.gotw.ca/publications/N1211.pdf)
+
 - [一篇总结二叉树的4种遍历方式（含模板）](https://mp.weixin.qq.com/s/0b5OsnFLLg18Td4CuR51_Q)
+
 - [详解 AVL 树（基础篇）](https://zhuanlan.zhihu.com/p/34899732)
+
 - [红黑树的演变](https://www.cnblogs.com/tiancai/p/9072813.html)
+
+- [C++迭代器失效的几种情况总结](https://www.cnblogs.com/fnlingnzb-learner/p/9300073.html)
 
