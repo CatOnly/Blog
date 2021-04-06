@@ -1504,12 +1504,24 @@ int main(int argc, char* argv[]) {
 
 ```c++
 // 内存占用最低
+#include <map> 
 std::map<string, int> mapTemp;
 
-// 由散列表实现的 hash table, 占用内存较多, 使用一个下标范围比较大的数组来存储元素, 形成很多的桶
-std::hash_map<string, int> hashMapTemp;
+#if defined __GNUC__ || defined __APPLE__ 
+#include <ext/hash_map> 
+#else 
+#include <hash_map> 
+#endif 
+// 由散列表实现的 hash table
+// - 占用内存较多
+// - 使用一个下标范围比较大的数组来存储元素解决 hash 冲突, 形成很多的桶
+__gnu_cxx::hash_map<string, int> hashMapTemp;
 
-// C++11 由散列表实现的 hash table, 内存占用较 hash_map 低, 查找、插入速度比 hash_map 高
+// C++11 由散列表实现的 hash table
+// - 内存占用较 hash_map 低
+// - 使用链表的结构来存储元素解决 hash 冲突
+// - 查找、插入速度比 hash_map 高
+#include <unordered_map> 
 std::unordered_map<string, int> hashMapUnorder;
 ```
 
@@ -1629,5 +1641,5 @@ erase 迭代器只是被删元素的迭代器失效，但是返回值为 void，
 
 - [红黑树的演变](https://www.cnblogs.com/tiancai/p/9072813.html)
 
-- [C++迭代器失效的几种情况总结](https://www.cnblogs.com/fnlingnzb-learner/p/9300073.html)
+- [C++ 迭代器失效的几种情况总结](https://www.cnblogs.com/fnlingnzb-learner/p/9300073.html)
 
