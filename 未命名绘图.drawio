@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-05-24T10:19:32.563Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15" etag="8rxnJndKx-N-yyyZm-9z" version="14.6.13" type="github">
+<mxfile host="app.diagrams.net" modified="2021-05-24T10:20:27.126Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15" etag="o5fh05gc_zqWDQ1Kjo9P" version="14.6.13" type="github">
   <diagram id="2uamDSMp3M37Ztlf-tgj" name="Page-1">
     <mxGraphModel dx="1378" dy="3102" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -466,18 +466,6 @@
             <mxPoint x="606" y="431" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xXhJY52AnUQ5JiELdNjx-2" value="&lt;h1&gt;File：Material&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。本质上是个脚本，确定绘制的 shader，贴图 和 绘制管线的流程与配置。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;其内容不会引用 Mesh/Skeleton 这类模型资源 与 灯光摆放位置和灯光信息这样的场景资源&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;a href=&quot;https://ogrecave.github.io/ogre-next/api/2.2/class_ogre_1_1_r_t_shader_1_1_texture_atlas_sampler_factory.html&quot;&gt;.tai 格式&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="20" y="960" width="310" height="194" as="geometry" />
-        </mxCell>
-        <mxCell id="xXhJY52AnUQ5JiELdNjx-1" value="&lt;h1&gt;File：Mesh / Skeleton&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;不可编辑，二进制&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;Blender / 3D Max plugin&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;&amp;nbsp;create XML to &amp;nbsp;Mesh (or Mesh to XML)&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;by&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;a href=&quot;https://sourceforge.net/projects/ogre/files/ogre-tools/&quot; style=&quot;font-size: 14px ; box-sizing: border-box ; outline: none ; margin: 0px ; padding: 0px ; text-decoration: none ; cursor: pointer ; word-wrap: break-word&quot;&gt;OgreCommandLineTools&lt;/a&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="20" y="800" width="310" height="146" as="geometry" />
-        </mxCell>
-        <mxCell id="xXhJY52AnUQ5JiELdNjx-3" value="&lt;h1&gt;File：Particle&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;本质上是个脚本，说明生成粒子所需的参数，会引用 Material 文件&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="360" y="800" width="310" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="xXhJY52AnUQ5JiELdNjx-7" value="&lt;h1&gt;File：Scene&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。主要负责配置灯光，模型。读取 .scene 文件需要使用额外的 &lt;a href=&quot;https://wiki.ogre3d.org/DotScene&quot;&gt;Ogre 插件 DotScene&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;其内容不包含任何 Material 相关，只包含相关的场景配置&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="360" y="960" width="310" height="150" as="geometry" />
-        </mxCell>
         <mxCell id="xXhJY52AnUQ5JiELdNjx-8" value="&lt;span style=&quot;font-family: &amp;#34;menlo&amp;#34; ; font-size: 11px&quot;&gt;SceneManger::&lt;/span&gt;&lt;span style=&quot;font-family: &amp;#34;menlo&amp;#34; ; font-size: 11px&quot;&gt;renderSingleObject&lt;/span&gt;" style="html=1;verticalAlign=bottom;startArrow=oval;endArrow=block;startSize=8;fontSize=20;align=center;" edge="1" parent="1" source="jB5qyqG0pWGTz93OIbAg-139" target="jB5qyqG0pWGTz93OIbAg-140">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="610" y="-420" as="sourcePoint" />
@@ -488,7 +476,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="xXhJY52AnUQ5JiELdNjx-9" value="getRenderOperation(ro)&#xa;mDestRenderSystem-&gt;_render(ro);" style="text;align=left;fontStyle=0;verticalAlign=middle;spacingLeft=3;spacingRight=3;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=10;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="837" y="-420" width="146" height="40" as="geometry" />
+          <mxGeometry x="837" y="-428" width="146" height="40" as="geometry" />
         </mxCell>
         <mxCell id="xXhJY52AnUQ5JiELdNjx-11" value="Resource" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=34;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
           <mxGeometry x="1148.5" y="280" width="200" height="34" as="geometry">
@@ -805,6 +793,21 @@
         </mxCell>
         <mxCell id="xXhJY52AnUQ5JiELdNjx-84" value="1" style="edgeLabel;resizable=0;html=1;align=right;verticalAlign=top;" connectable="0" vertex="1" parent="xXhJY52AnUQ5JiELdNjx-82">
           <mxGeometry x="1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xXhJY52AnUQ5JiELdNjx-134" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="50" y="760" width="650" height="354" as="geometry" />
+        </mxCell>
+        <mxCell id="xXhJY52AnUQ5JiELdNjx-2" value="&lt;h1&gt;File：Material&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。本质上是个脚本，确定绘制的 shader，贴图 和 绘制管线的流程与配置。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;其内容不会引用 Mesh/Skeleton 这类模型资源 与 灯光摆放位置和灯光信息这样的场景资源&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;a href=&quot;https://ogrecave.github.io/ogre-next/api/2.2/class_ogre_1_1_r_t_shader_1_1_texture_atlas_sampler_factory.html&quot;&gt;.tai 格式&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="xXhJY52AnUQ5JiELdNjx-134">
+          <mxGeometry y="160" width="310" height="194" as="geometry" />
+        </mxCell>
+        <mxCell id="xXhJY52AnUQ5JiELdNjx-1" value="&lt;h1&gt;File：Mesh / Skeleton&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;不可编辑，二进制&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;Blender / 3D Max plugin&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;&amp;nbsp;create XML to &amp;nbsp;Mesh (or Mesh to XML)&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;span style=&quot;font-size: 14px&quot;&gt;by&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;a href=&quot;https://sourceforge.net/projects/ogre/files/ogre-tools/&quot; style=&quot;font-size: 14px ; box-sizing: border-box ; outline: none ; margin: 0px ; padding: 0px ; text-decoration: none ; cursor: pointer ; word-wrap: break-word&quot;&gt;OgreCommandLineTools&lt;/a&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="xXhJY52AnUQ5JiELdNjx-134">
+          <mxGeometry width="310" height="146" as="geometry" />
+        </mxCell>
+        <mxCell id="xXhJY52AnUQ5JiELdNjx-3" value="&lt;h1&gt;File：Particle&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;本质上是个脚本，说明生成粒子所需的参数，会引用 Material 文件&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="xXhJY52AnUQ5JiELdNjx-134">
+          <mxGeometry x="340" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xXhJY52AnUQ5JiELdNjx-7" value="&lt;h1&gt;File：Scene&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;可编辑，也可由编辑器生成。主要负责配置灯光，模型。读取 .scene 文件需要使用额外的 &lt;a href=&quot;https://wiki.ogre3d.org/DotScene&quot;&gt;Ogre 插件 DotScene&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;其内容不包含任何 Material 相关，只包含相关的场景配置&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px ; background-color: rgb(255 , 255 , 255)&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="xXhJY52AnUQ5JiELdNjx-134">
+          <mxGeometry x="340" y="160" width="310" height="150" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
